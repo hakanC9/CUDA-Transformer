@@ -62,6 +62,6 @@ target_link_libraries(CUDATransformer
     clangSerialization
     clangTooling
     clangEdit
-    ${LLVM_LIBS}    # Can be redundant but still safe to include since a lot of clang components initially needs llvm
+    ${LLVM_LIBS}    # Can be redundant but still safe to include since a lot of clang components internally needs llvm
 )
 
