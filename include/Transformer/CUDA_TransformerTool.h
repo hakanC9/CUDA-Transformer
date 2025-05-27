@@ -10,55 +10,62 @@
 #include <vector>
 #include "iostream"
 #include <sstream>
+#include <filesystem>
 
 class CUDA_TransformerTool {
 public:
 
     CUDA_TransformerTool(std::string resourceDir);
 
-    std::vector<double> evaluate(const std::string filePath, const std::string optChoices, std::string resultDir, std::string compileOptions);
+    std::vector<std::string> analyze(std::vector<std::string> sourcePaths);
 
-    std::string analyzeOptimizationChoices(const std::string filePath);
+    std::vector<std::string> analyze(std::string &directoryPath);
 
-    std::shared_ptr<std::string> getOptimizationPossibilities() const {return optimizationPossibilities;}
+    std::vector<std::string> transform(std::vector<std::string> sourcePaths, std::string resultDir, std::string opitimizationString, std::string indicesString, 
+        std::string compileOptions, std::string executable);
 
-    std::shared_ptr<std::string> getoutputFilePath() const {return outputFilePath;}
+    std::vector<std::string> transform(std::string &directoryPath, std::string resultDir, std::string opitimizationString, std::string indicesString, 
+        std::string compileOptions, std::string executable);    
+
+    std::vector<std::string> transformSingle(std::string sourcePath, std::string resultDir, std::string opitimizationString, 
+        std::string compileOptions, std::string executable);
+
 
 
 private:
-    std::string resourceDir;
-    std::string filePath;
-    bool analyzerMode;
+
     std::unique_ptr<clang::tooling::CompilationDatabase> Compilations;
-    std::shared_ptr<std::string> optimizationPossibilities;
-    std::shared_ptr<std::string>  outputFilePath;
 
-    std::string executable;
 
-    void compile(const std::string compileOptions){
-
-        // change .cu to .o
-        std::string outputFile = *outputFilePath; 
-        std::string executableName = outputFile.substr(0, outputFile.size() - 3) + ".o";
+    void compile(const std::string compileOptions, const std::string &directoryPath){
         
-        executable = executableName;
+        std::vector<std::string> cuFiles;
 
-        // create the command
-        std::string command = "nvcc " + outputFile + " -o " + executableName + " " + compileOptions;
+        for (const auto &entry : std::filesystem::recursive_directory_iterator(directoryPath)) {
+            if (entry.is_regular_file() && entry.path().extension() == ".cu") {
+                cuFiles.push_back(entry.path().string());
+            }
+        }
+        for(auto cuFile : cuFiles){
+            // change .cu to .o
+            std::string executableName = cuFile.substr(0, cuFile.size() - 3) + ".o";
+            
+            // create the command
+            std::string command = "nvcc " + cuFile + " -o " + executableName + " " + compileOptions;
+            
+            
+            // run the command
+            int result = std::system(command.c_str());
         
-        //std::cout << "Compiling with command: " << command << std::endl;
-        
-        // run the command
-        int result = std::system(command.c_str());
-    
-        if (result != 0) {
-            std::cerr << "Compilation failed with code: " << result << std::endl;
-        } else {
-            std::cout << "Compilation succeeded. Executable: " << executableName << std::endl;
+            if (result != 0) {
+                std::cerr << "Compilation failed with code: " << result << std::endl;
+            } else {
+                std::cout << "Compilation succeeded. Executable: " << executableName << std::endl;
+            }
         }
     }
 
-    std::string run(){
+    std::string run(std::string executable){
         
         std::string command = "./" + executable;
 
@@ -80,10 +87,7 @@ private:
         return executionResult.str();
     }
 
-    std::string runDepoTool(){
-
-        // std::string password = "pars";
-        // std::string command = "echo " + password + " | sudo ../energy1.sh " + executable;
+    std::string runDepoTool(std::string executable){
         
         std::string command = "sudo ../energy1.sh " + executable;
 
@@ -105,28 +109,29 @@ private:
         return executionResult.str();
     }
 
-    std::vector<double> getDepoResults(std::string depoOutputString){
+    std::vector<std::string> getDepoResults(std::string depoOutputString){
 
         // Catch the floating point part of the string
         std::regex numberRegex(R"((\d+(\.\d+)?))");
         std::smatch match;
-        std::vector<double> values;
+        std::vector<std::string> values;
 
         auto begin = depoOutputString.cbegin();
         auto end = depoOutputString.cend();
 
         while (std::regex_search(begin, end, match, numberRegex)) {
-            values.push_back(std::stod(match[1]));
+            values.push_back(match[1]);
             begin = match.suffix().first;
         }
 
         // If vector is empty (moslty means depo tool calculations are 0), return 0 0 0 values
         while (values.size() < 3) {
-            values.push_back(0.0);
+            values.push_back("0.0");
         }
 
         return values;
     }
+
 };
 
 #endif

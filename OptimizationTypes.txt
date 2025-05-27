@@ -1,0 +1,51 @@
+0- Synchthreads
+	0 - Do Nothing
+	1 - Skipping
+	2 - Replace with syncwarp
+	3 - Replace with tile
+	4 - Replace with active
+1- Atomic
+	0 - Do Nothing
+	1 - Replace atomic with direct operation
+	2 - Replace atomic with atomicXXX_block
+2- Double
+	0 - Do Nothing
+	1 - Change double to float
+3- Kernel launch Block Reduction
+	0 - Do Nothing
+	1 - Block size decrease by one
+	2 - Block size decrease by two
+4- Kernel Launch Thread Reduction
+	0 - Do Nothing
+	1 - Thread size decrease by 32
+	2 - Thread size decrease by 64
+5- Kernel Launch loop perforation
+	0 - Do Nothing
+	1 - Loop perforation %5
+	2 - Loop perforation %10
+	3 - Loop perforation %15
+	4 - Loop perforation %20
+6- Kernel function inside Loop Perforation
+	0- Do Nothing
+	1- Loop perforation %5
+	2- Loop perforation %10
+	3- Loop perforation %15
+	4- Loop perforation %20
+7- One branch if
+	0 - Do Nothing
+	1 - Delete body
+	2 - Choose branch body
+8- Two Branch If
+	0 - Do Nothing
+	1 - Delete all body
+	2 - Choose branch one body
+	3 - Choose branch two body
+9- Three Branch If
+	0 - Do Nothing
+	1 - Delete all body
+	2 - Choose branch one body
+	3 - Choose branch two body
+	4 - Choose branch three body
+
+
+	

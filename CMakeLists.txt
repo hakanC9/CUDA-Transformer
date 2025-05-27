@@ -19,9 +19,15 @@ add_executable(CUDATransformer                      # Needs to be changed to add
     main.cpp                                        # Needs to be removed for standalone (library) use
     src/CUDA_TransformerTool.cpp
     src/Transformer.cpp
-    src/CUDA_FrontendAction.cpp
     src/CUDA_ASTVisitor.cpp
-    src/CUDA_ASTConsumer.cpp
+    
+    src/CUDA_Transform_FrontendActionFactory.cpp
+    src/CUDA_Transform_FrontendAction.cpp
+    src/CUDA_Transform_ASTConsumer.cpp
+    
+    src/CUDA_Analyze_FrontendActionFactory.cpp
+    src/CUDA_Analyze_FrontendAction.cpp
+    src/CUDA_Analyze_ASTConsumer.cpp
 
     src/Commands/RemoveSyncThread.cpp
     src/Commands/ReplaceSyncWithWarp.cpp
