@@ -66,7 +66,7 @@ CUDATransformer library* is a tool that is built on LLVM's [Libtooling](https://
 ## Building CUDATransformer
 
 The tool is built [out-of-tree](https://www.youtube.com/watch?v=7wOU7csj1ME). So no need to configure cmake files in clang-tools-extra directory. Simply;
-    ```bash
+1.  ```bash
     git clone https://github.com/hakanC9/CUDA-Transformer.git
     mkdir CUDA-Transformer/build && cd CUDA-Transformer/build
     cmake ..
