@@ -24,7 +24,7 @@ CUDATransformer library* is a tool that is built on LLVM's [Libtooling](https://
 
 3. Configure cmake. Suggested commands:
     ```bash
-    cmake -S ../llvm -. -G "Ninja" \
+    cmake -S ../llvm -B. -G "Ninja" \
     -DLLVM_ENABLE_PROJECTS="clang;clang-tools-extra" \
     -DCMAKE_BUILD_TYPE=Release \ 
     -DLLVM_ABI_BREAKING_CHECKS=FORCE_OFF \
