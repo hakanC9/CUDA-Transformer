@@ -21,17 +21,6 @@ public:
 
     std::vector<std::string> analyze(std::string &directoryPath);
 
-    std::vector<std::string> transform(std::vector<std::string> sourcePaths, std::string resultDir, std::string opitimizationString, std::string indicesString, 
-        std::string compileOptions, std::string executable);
-
-    std::vector<std::string> transform(std::string &directoryPath, std::string resultDir, std::string opitimizationString, std::string indicesString, 
-        std::string compileOptions, std::string executable);    
-
-    std::vector<std::string> transformSingle(std::string sourcePath, std::string resultDir, std::string opitimizationString, 
-        std::string compileOptions, std::string executable);
-
-    void printConfigs();
-
     std::vector<std::string> transform();
 
 private:
@@ -62,15 +51,14 @@ private:
         
             if (result != 0) {
                 std::cerr << "Compilation failed with code: " << result << std::endl;
-            } else {
-                std::cout << "Compilation succeeded. Executable: " << executableName << std::endl;
             }
         }
     }
 
     std::string run(std::string executable){
         
-        std::string command = "./temp_results/" + executable;
+        std::cout << "\nExecuting the main...\n";
+        std::string command = "./temp_results/" + executable + ".o";
 
         std::array<char, 128> buffer;
         std::stringstream executionResult;
@@ -92,7 +80,8 @@ private:
 
     std::string runDepoTool(std::string executable){
         
-        std::string command = "sudo ../energy1.sh " + executable;
+        std::cout << "\nExecuting the depo...\n";
+        std::string command = "sudo ../energy1.sh temp_results/" + executable + ".o";
 
         std::array<char, 128> buffer;
         std::stringstream executionResult;

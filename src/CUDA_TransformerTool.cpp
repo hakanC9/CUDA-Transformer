@@ -149,10 +149,6 @@ std::vector<std::string> CUDA_TransformerTool::transform(){
         indexVec.push_back(std::stoi(temp));
     }
 
-    for(auto i : indexVec){
-        std::cout << i << "\n";
-    }
-
     std::vector<std::string> optimizationsToApply;
     int start = 0;
 

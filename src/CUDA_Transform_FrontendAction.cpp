@@ -43,9 +43,7 @@ void CUDA_Transform_FrontendAction::EndSourceFileAction(){
 
     std::filesystem::path outputPath = std::filesystem::path(resultDir) / originalFileName;
 
-
-    std::cout << "THIS IS THE OUTPUTPATH VARIABLE: " << outputPath;
-
+    
     llvm::raw_fd_ostream outFile(outputPath.string(), ec, llvm::sys::fs::OF_None);
     if (ec) {
         llvm::errs() << "Error opening file " << outputPath << ": " << ec.message() << "\n";
