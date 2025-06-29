@@ -3,11 +3,10 @@
 #include "clang/Frontend/CompilerInstance.h"
 
 CUDA_Transform_FrontendAction::CUDA_Transform_FrontendAction(
-    std::string optChoices, 
-    std::string resultDir)
+    std::string optChoices)
     : 
-    OptChoices(optChoices),
-    resultDir(resultDir) {}
+    OptChoices(optChoices)
+    {}
 
 
 std::unique_ptr<clang::ASTConsumer> CUDA_Transform_FrontendAction::CreateASTConsumer(clang::CompilerInstance &Compiler, llvm::StringRef InFile) {
@@ -21,32 +20,39 @@ std::unique_ptr<clang::ASTConsumer> CUDA_Transform_FrontendAction::CreateASTCons
 
 void CUDA_Transform_FrontendAction::EndSourceFileAction(){
 
-        clang::SourceManager &SM = TheRewriter.getSourceMgr();
-        clang::FileID mainFileID = SM.getMainFileID();
-    
+    clang::SourceManager &SM = TheRewriter.getSourceMgr();
+    clang::FileID mainFileID = SM.getMainFileID();
 
-        std::error_code ec;
-    
-        // Create the directory if it doesn't exist
-        if (!std::filesystem::exists(resultDir)) {
-            if (!std::filesystem::create_directory(resultDir, ec)) {
-                llvm::errs() << "Error creating directory 'results': " << ec.message() << "\n";
-                return;
-            }
-        }
-    
+    auto EntryRefOrErr = SM.getFileEntryRefForID(mainFileID);
+    if (!EntryRefOrErr) {
+        llvm::errs() << "Error: Could not get FileEntryRef for main file ID.\n";
+        return;
+    }
 
-        std::string newFileName = OptChoices + ".cu";   //=> 101.cu
-        std::filesystem::path outputPath = resultDir +"/"+ newFileName; //=>example/101.cu 
-    
-        // Open a file stream for the new file
-        llvm::raw_fd_ostream outFile(outputPath.string(), ec, llvm::sys::fs::OF_None);
-    
-        if (ec) {
-            llvm::errs() << "Error opening file " << outputPath << ": " << ec.message() << "\n";
+    const clang::FileEntryRef &EntryRef = *EntryRefOrErr;
+    std::string originalFileName = std::filesystem::path(EntryRef.getName().str()).filename().string();
+
+    std::string resultDir = "temp_results";
+    std::error_code ec;
+    if (!std::filesystem::exists(resultDir)) {
+        if (!std::filesystem::create_directory(resultDir, ec)) {
+            llvm::errs() << "Error creating directory 'temp_results': " << ec.message() << "\n";
             return;
         }
-    
-        TheRewriter.getEditBuffer(mainFileID).write(outFile);
-        outFile.close();
+    }
+
+    std::filesystem::path outputPath = std::filesystem::path(resultDir) / originalFileName;
+
+
+    std::cout << "THIS IS THE OUTPUTPATH VARIABLE: " << outputPath;
+
+    llvm::raw_fd_ostream outFile(outputPath.string(), ec, llvm::sys::fs::OF_None);
+    if (ec) {
+        llvm::errs() << "Error opening file " << outputPath << ": " << ec.message() << "\n";
+        return;
+    }
+
+    TheRewriter.getEditBuffer(mainFileID).write(outFile);
+    outFile.close();
+
 }

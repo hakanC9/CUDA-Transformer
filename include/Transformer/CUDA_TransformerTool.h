@@ -15,7 +15,7 @@
 class CUDA_TransformerTool {
 public:
 
-    CUDA_TransformerTool(std::string resourceDir);
+    CUDA_TransformerTool();
 
     std::vector<std::string> analyze(std::vector<std::string> sourcePaths);
 
@@ -30,12 +30,15 @@ public:
     std::vector<std::string> transformSingle(std::string sourcePath, std::string resultDir, std::string opitimizationString, 
         std::string compileOptions, std::string executable);
 
+    void printConfigs();
 
+    std::vector<std::string> transform();
 
 private:
 
     std::unique_ptr<clang::tooling::CompilationDatabase> Compilations;
 
+    std::map<std::string, std::string> Configurations;
 
     void compile(const std::string compileOptions, const std::string &directoryPath){
         
@@ -67,7 +70,7 @@ private:
 
     std::string run(std::string executable){
         
-        std::string command = "./" + executable;
+        std::string command = "./temp_results/" + executable;
 
         std::array<char, 128> buffer;
         std::stringstream executionResult;

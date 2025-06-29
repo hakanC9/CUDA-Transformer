@@ -7,14 +7,14 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # Can needed if the client code can not be compiled with clang++ 
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -frtti -fexceptions")
 
-find_package(LLVM REQUIRED CONFIG)
+#find_package(LLVM REQUIRED CONFIG)
 find_package(Clang REQUIRED CONFIG)
 
 message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
 message(STATUS "Found CLANG ${CLANG_PACKAGE_VERSION}")
 
-set(LLVM_DIR "/home/pars/Desktop/llvm-project")     # Needs to be configured for different systems
-
+#set(LLVM_DIR "/home/pars/Desktop/llvm-project")     # Needs to be configured for different systems
+set(LLVM_DIR "../llvm-project")
 add_executable(CUDATransformer                      # Needs to be changed to add library (static/shared)
     main.cpp                                        # Needs to be removed for standalone (library) use
     src/CUDA_TransformerTool.cpp
@@ -62,6 +62,6 @@ target_link_libraries(CUDATransformer
     clangSerialization
     clangTooling
     clangEdit
-    ${LLVM_LIBS}    # Can be redundant but still safe to include since a lot of clang components initially needs llvm
+    #${LLVM_LIBS}    # Can be redundant but still safe to include since a lot of clang components initially needs llvm
 )
 
