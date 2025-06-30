@@ -55,10 +55,10 @@ private:
         }
     }
 
-    std::string run(std::string executable){
+    std::string run(std::string executable, std::string runOptions){
         
         std::cout << "\nExecuting the main...\n";
-        std::string command = "./temp_results/" + executable + ".o";
+        std::string command = "./temp_results/" + executable + ".o " + runOptions;
 
         std::array<char, 128> buffer;
         std::stringstream executionResult;
