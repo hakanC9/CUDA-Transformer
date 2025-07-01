@@ -19,7 +19,7 @@ public:
 
     std::vector<std::string> analyze(std::vector<std::string> sourcePaths);
 
-    std::vector<std::string> analyze(std::string &directoryPath);
+    std::vector<std::string> analyze();
 
     std::vector<std::string> transform();
 

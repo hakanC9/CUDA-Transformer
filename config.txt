@@ -4,8 +4,9 @@ c_standard=c++17
 omit_extensions=x
 target=cuda
 compile_options=-w;-Wno-deprecated-gpu-targets
+includes=/home/pars/Desktop/grappolo/gpu_graph
 
-project_path=/home/pars/Desktop/project_example/
+project_path=/home/pars/Desktop/grappolo/gpu_graph
 
 optimization_string=11111111
 optimization_indices=5-3

@@ -8,11 +8,17 @@ int main(int argc, char** arv) {
     CUDA_TransformerTool TransformerToolTest;
 
 
-    std::vector<std::string>results = TransformerToolTest.transform();
-
-
-    for(auto result : results){
+    std::vector<std::string> analyzeResults = TransformerToolTest.analyze();
+     
+    for(auto result : analyzeResults){
         std::cout << result + "\n";
     }
+
+    // std::vector<std::string> transformResults = TransformerToolTest.transform();
+
+
+    // for(auto result : transformResults){
+    //     std::cout << result + "\n";
+    // }
 
 }

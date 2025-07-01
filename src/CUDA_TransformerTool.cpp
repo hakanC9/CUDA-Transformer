@@ -36,7 +36,8 @@ std::map<std::string, std::string> readConfig() {
 
 
 /**
- * @brief A helper function that parses config.txt file's semicolumn seperated compile_options key's value
+ * @brief A helper function that parses config.txt files compile_options key
+ * @param line   A string with semicolumn seperated values
  * @return std::string whitespace seperated compile options
 */
 std::string parseCompileOptions(std::string line){
@@ -54,6 +55,27 @@ std::string parseCompileOptions(std::string line){
 }
 
 
+/**
+ * @brief A helper function that parses config.txt files includes key
+ * @param line   A string with semicolumn seperated values
+ * @return std::vector<std::string> all parsed include options with -I prefix
+*/
+std::vector<std::string>  parseIncludes(std::string line){
+
+    std::stringstream ss(line);
+
+    std::vector<std::string> include;
+    std::string temp;
+
+    while(std::getline(ss, temp, ';')){
+        include.push_back("-I" + temp);
+    }
+
+    return include;
+}
+
+
+
 CUDA_TransformerTool::CUDA_TransformerTool() {
 
     auto config = readConfig();
@@ -64,6 +86,10 @@ CUDA_TransformerTool::CUDA_TransformerTool() {
         config["target"],
         "-resource-dir=" + config["resource_dir"]
     };
+
+    for(auto inc : parseIncludes(config["includes"])){
+        compileFlags.push_back(inc);
+    }
 
     Configurations = config;
 
@@ -95,16 +121,14 @@ std::vector<std::string> CUDA_TransformerTool::analyze(std::vector<std::string> 
 
 
 /**
- * @brief A function to analyze given .cu file to obtain which optimizations can be applied.
+ * @brief A function to analyze .cu files in the target project directory to obtain which optimizations can be applied.
  * 
- * @param sourcePaths   A vector containing paths to target .cu files (example: /home/Desktop/project/example.cu)
- * @return              A vector containing optimizations to apply in order given with parameter (example: {347, 34667})
+ * @return A vector containing optimizations to apply in order given with parameter (example: {347, 34667})
  */
-std::vector<std::string> CUDA_TransformerTool::analyze(std::string &directoryPath){
+std::vector<std::string> CUDA_TransformerTool::analyze(){
 
     std::vector<std::string> cuFiles;
-
-    for (const auto &entry : std::filesystem::recursive_directory_iterator(directoryPath)) {
+    for (const auto &entry : std::filesystem::recursive_directory_iterator(Configurations["project_path"])) {
         if (entry.is_regular_file() && entry.path().extension() == ".cu") {
             cuFiles.push_back(entry.path().string());
         }
