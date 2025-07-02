@@ -8,13 +8,12 @@
 class CUDA_Transform_FrontendActionFactory : public clang::tooling::FrontendActionFactory {
     public:
 
-        explicit CUDA_Transform_FrontendActionFactory(std::string resultDir, std::vector<std::string> optimizationsToApply);
+        explicit CUDA_Transform_FrontendActionFactory(std::vector<std::string> optimizationsToApply);
     
         std::unique_ptr<clang::FrontendAction> create() override;
         
     private:
 
-        std::string resultDir;
         int optimizationIndex = 0;
         std::vector<std::string> optimizationsToApply;
     };

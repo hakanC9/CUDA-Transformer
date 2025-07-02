@@ -9,7 +9,8 @@ CUDA_Analyze_ASTConsumer::CUDA_Analyze_ASTConsumer(
     std::shared_ptr<std::vector<std::string>> optimizationPossibilities)
     : 
     analysisVisitor(context, writer, targetExpressions), 
-    writer(writer), transformer(transformer),
+    writer(writer), 
+    transformer(transformer),
     targetExpressions(targetExpressions),
     optimizationPossibilities(optimizationPossibilities) {}
 

@@ -14,7 +14,7 @@
 class CUDA_Transform_FrontendAction : public clang::ASTFrontendAction {
 
     public:
-        CUDA_Transform_FrontendAction(std::string optChoices, std::string resultDir);
+        CUDA_Transform_FrontendAction(std::string optChoices);
 
         std::unique_ptr<clang::ASTConsumer> CreateASTConsumer(
             clang::CompilerInstance &Compiler,
@@ -29,7 +29,6 @@ class CUDA_Transform_FrontendAction : public clang::ASTFrontendAction {
         Transformer transformer;
         
         std::string OptChoices;
-        std::string resultDir;
 };
 
 #endif

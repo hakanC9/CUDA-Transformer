@@ -15,27 +15,19 @@
 class CUDA_TransformerTool {
 public:
 
-    CUDA_TransformerTool(std::string resourceDir);
+    CUDA_TransformerTool();
 
     std::vector<std::string> analyze(std::vector<std::string> sourcePaths);
 
-    std::vector<std::string> analyze(std::string &directoryPath);
+    std::vector<std::string> analyze();
 
-    std::vector<std::string> transform(std::vector<std::string> sourcePaths, std::string resultDir, std::string opitimizationString, std::string indicesString, 
-        std::string compileOptions, std::string executable);
-
-    std::vector<std::string> transform(std::string &directoryPath, std::string resultDir, std::string opitimizationString, std::string indicesString, 
-        std::string compileOptions, std::string executable);    
-
-    std::vector<std::string> transformSingle(std::string sourcePath, std::string resultDir, std::string opitimizationString, 
-        std::string compileOptions, std::string executable);
-
-
+    std::vector<std::string> transform(std::string optimizationString, std::string optimizationIndices);
 
 private:
 
     std::unique_ptr<clang::tooling::CompilationDatabase> Compilations;
 
+    std::map<std::string, std::string> Configurations;
 
     void compile(const std::string compileOptions, const std::string &directoryPath){
         
@@ -59,15 +51,14 @@ private:
         
             if (result != 0) {
                 std::cerr << "Compilation failed with code: " << result << std::endl;
-            } else {
-                std::cout << "Compilation succeeded. Executable: " << executableName << std::endl;
             }
         }
     }
 
-    std::string run(std::string executable){
+    std::string run(std::string executable, std::string runOptions){
         
-        std::string command = "./" + executable;
+        std::cout << "\nExecuting the main...\n";
+        std::string command = "./temp_results/" + executable + ".o " + runOptions;
 
         std::array<char, 128> buffer;
         std::stringstream executionResult;
@@ -89,7 +80,8 @@ private:
 
     std::string runDepoTool(std::string executable){
         
-        std::string command = "sudo ../energy1.sh " + executable;
+        std::cout << "\nExecuting the depo...\n";
+        std::string command = "sudo ../energy1.sh temp_results/" + executable + ".o";
 
         std::array<char, 128> buffer;
         std::stringstream executionResult;
