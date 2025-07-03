@@ -14,7 +14,7 @@ int main(int argc, char** arv) {
         std::cout << result + "\n";
     }
 
-    // std::vector<std::string> transformResults = TransformerToolTest.transform();
+    // std::vector<std::string> transformResults = TransformerToolTest.transform("11111111", "5-3");
 
 
     // for(auto result : transformResults){

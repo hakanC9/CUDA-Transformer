@@ -8,9 +8,6 @@ includes=/home/pars/Desktop/grappolo/gpu_graph;/home/pars/Desktop/grappolo/Defin
 
 project_path=/home/pars/Desktop/grappolo/gpu_graph
 
-optimization_string=11111111
-optimization_indices=5-3
-
 executable=example
 
 run_options=

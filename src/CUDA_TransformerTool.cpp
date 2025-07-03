@@ -162,13 +162,17 @@ std::vector<std::string> CUDA_TransformerTool::analyze(){
  * @brief A function to transform, compile, execute and collect metrics with depo tool. Using CUDA_TransformerTool::analyze before this function
  * to determine which optimization choices to use is encouraged.
  *
+ * @param optimizationString    A string of optimization to apply for each target file (example: 11111111)
+ * @param optimizationIndices   A string of "-" seperated values that corresponds each individual optimization strings size 
+                                (example: 5-3 corresponds to 11111 and 111 for the optimizationString=11111111)
+ *
  * @return std::vector<string> : 
  * 0 -> Execution Result: Unknown
  * 1 -> Energy Consumption (E): Joule
  * 2 -> Execution Time (t): second
  * 3 -> Power Consumption (P): Watt
 */
-std::vector<std::string> CUDA_TransformerTool::transform(){
+std::vector<std::string> CUDA_TransformerTool::transform(std::string optimizationString, std::string optimizationIndices){
 
 
     // Get paths of all cuda files
@@ -184,7 +188,7 @@ std::vector<std::string> CUDA_TransformerTool::transform(){
 
     // Extract each individual optimizations
 
-    std::stringstream ss(Configurations["optimization_indices"]);
+    std::stringstream ss(optimizationIndices);
 
     std::vector<int> indexVec;
     std::string temp;
@@ -197,7 +201,7 @@ std::vector<std::string> CUDA_TransformerTool::transform(){
     int start = 0;
 
     for (int index : indexVec) {
-        optimizationsToApply.push_back(Configurations["optimization_string"].substr(start,index));
+        optimizationsToApply.push_back(optimizationString.substr(start,index));
         start += index;
     }
 

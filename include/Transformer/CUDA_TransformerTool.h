@@ -21,7 +21,7 @@ public:
 
     std::vector<std::string> analyze();
 
-    std::vector<std::string> transform();
+    std::vector<std::string> transform(std::string optimizationString, std::string optimizationIndices);
 
 private:
 
