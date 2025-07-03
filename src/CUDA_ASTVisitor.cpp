@@ -57,12 +57,11 @@ bool CUDA_ASTVisitor::VisitFunctionDecl(clang::FunctionDecl *funcDecl)
         isVisitorInsideKernel = true;
 
         // Catch the body of the kernel function
-        clang::CompoundStmt *body = llvm::dyn_cast<clang::CompoundStmt>(funcDecl->getBody());
+        clang::Stmt* stmt = funcDecl->getBody();
+        if (!stmt) return false;  // or handle safely
 
-        if (!body)
-        {
-            return false;
-        }
+        auto *body = llvm::dyn_cast<clang::CompoundStmt>(stmt);
+        if (!body) return false;
 
         if (body && !body->body_empty())
         {

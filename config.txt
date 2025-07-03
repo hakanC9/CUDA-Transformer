@@ -1,10 +1,10 @@
 resource_dir=/home/pars/Desktop/llvm-project/build/lib/clang/21
 
-c_standard=c++17
-omit_extensions=x
-target=cuda
+compilation_database_options=-std=c++17;-x;cuda;-DRUNONGPU=1;--cuda-gpu-arch=sm_75
+
 compile_options=-w;-Wno-deprecated-gpu-targets
-includes=/home/pars/Desktop/grappolo/gpu_graph
+
+includes=/home/pars/Desktop/grappolo/gpu_graph;/home/pars/Desktop/grappolo/DefineStructure;/usr/local/cuda-12.8/include
 
 project_path=/home/pars/Desktop/grappolo/gpu_graph
 

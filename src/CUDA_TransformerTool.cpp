@@ -1,3 +1,4 @@
+#include "clang/Tooling/CompilationDatabase.h"
 #include "clang/Tooling/Tooling.h"
 #include "llvm/Support/raw_ostream.h"
 
@@ -54,6 +55,25 @@ std::string parseCompileOptions(std::string line){
     return options;
 }
 
+/**
+ * @brief A helper function that parses config.txt files compile_options key
+ * @param line   A string with semicolumn seperated values
+ * @return std::string whitespace seperated compile options
+*/
+std::vector<std::string>  parseCompilationDatabaseOptions(std::string line){
+
+    std::stringstream ss(line);
+
+    std::vector<std::string>  options;
+    std::string temp;
+
+    while(std::getline(ss, temp, ';')){
+        options.push_back(temp);
+    }
+
+    return options;
+}
+
 
 /**
  * @brief A helper function that parses config.txt files includes key
@@ -75,17 +95,17 @@ std::vector<std::string>  parseIncludes(std::string line){
 }
 
 
-
 CUDA_TransformerTool::CUDA_TransformerTool() {
 
     auto config = readConfig();
 
-    std::vector<std::string> compileFlags = {
-        "-std=" + config["c_standard"],
-        "-" + config["omit_extensions"],
-        config["target"],
-        "-resource-dir=" + config["resource_dir"]
-    };
+    std::vector<std::string> compileFlags;
+
+    compileFlags.push_back("-resource-dir=" + config["resource_dir"]);
+
+    for(auto inc : parseCompilationDatabaseOptions(config["compilation_database_options"])){
+        compileFlags.push_back(inc);
+    }    
 
     for(auto inc : parseIncludes(config["includes"])){
         compileFlags.push_back(inc);

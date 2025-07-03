@@ -43,25 +43,23 @@ void KernelCallReduction::execute()
         const clang::Expr *threadArg = config->getArg(1);
 
         // For the first parameter
-        if (const clang::CXXConstructExpr *constructExpr = llvm::dyn_cast<clang::CXXConstructExpr>(blockArg))
-        {
-            // True state that its dim3 parameter so this change is different from other
-            changeLaunchParameter(constructExpr, true, blockReductionRate);
-        }
-        else
-        {
-            changeLaunchParameter(blockArg, false, blockReductionRate);
+        if (blockArg) {
+            if (const auto *constructExpr = llvm::dyn_cast<clang::CXXConstructExpr>(blockArg)) {
+                changeLaunchParameter(constructExpr, true, blockReductionRate);
+            } else {
+                changeLaunchParameter(blockArg, false, blockReductionRate);
+            }
         }
 
         // For the second parameter
-        if (const clang::CXXConstructExpr *constructExpr = llvm::dyn_cast<clang::CXXConstructExpr>(threadArg))
-        {
-            // True state that its dim3 parameter so this change is different from other
-            changeLaunchParameter(constructExpr, true, threadReductionRate);
+        if(threadArg){
+            if (const clang::CXXConstructExpr *constructExpr = llvm::dyn_cast<clang::CXXConstructExpr>(threadArg)){
+                // True state that its dim3 parameter so this change is different from other
+                changeLaunchParameter(constructExpr, true, threadReductionRate);
+            } else{
+                changeLaunchParameter(threadArg, false, threadReductionRate);
+            }
         }
-        else
-        {
-            changeLaunchParameter(threadArg, false, threadReductionRate);
-        }
+
     }
 }
