@@ -235,3 +235,54 @@ std::vector<std::string> CUDA_TransformerTool::transform(std::string optimizatio
 
     return results;
 }
+
+
+
+void CUDA_TransformerTool::transformOnly(){
+
+
+    // Get paths of all cuda files
+
+    std::vector<std::string> cuFiles;
+
+    for (const auto &entry : std::filesystem::recursive_directory_iterator(Configurations["project_path"])) {
+        if (entry.is_regular_file() && entry.path().extension() == ".cu") {
+            cuFiles.push_back(entry.path().string());
+        }
+    }
+
+
+    // Extract each individual optimizations
+
+    std::stringstream ss(Configurations["index"]);
+
+    std::vector<int> indexVec;
+    std::string temp;
+
+    while(std::getline(ss, temp, '-')){
+        indexVec.push_back(std::stoi(temp));
+    }
+
+    std::vector<std::string> optimizationsToApply;
+    int start = 0;
+
+    for (int index : indexVec) {
+        optimizationsToApply.push_back(Configurations["optimization"].substr(start,index));
+        start += index;
+    }
+
+
+    // Run the tool
+
+    clang::tooling::ClangTool Tool(*Compilations, cuFiles);
+
+    CUDA_Transform_FrontendActionFactory Factory(optimizationsToApply);
+
+    int result = Tool.run(&Factory);
+
+    if (result != 0){
+        llvm::errs() << "Error running transform!\n";
+        exit(-1);
+    }
+
+}

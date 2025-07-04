@@ -35,7 +35,17 @@ void LoopPerforation::execute()
         return;
     }
 
-    rewriter.InsertTextBefore(forStmt->getInc()->getBeginLoc().getLocWithOffset(-2), appendedString);
+    clang::Expr *incExpr = forStmt->getInc();
+    clang::SourceRange incRange = incExpr->getSourceRange();
+
+    std::string incStr = clang::Lexer::getSourceText(
+        clang::CharSourceRange::getTokenRange(incRange),
+        context.getSourceManager(), context.getLangOpts()).str();
+
+    std::string newIncStr = "(" + incStr + ") * " + std::to_string(perforationRate);
+
+    rewriter.ReplaceText(incRange, newIncStr);
+
  
 
     rewriter.InsertTextBefore(forStmt->getBeginLoc(), "//////// CUDA-TRANSFORMER WAS HERE : Loop Perforation\n");

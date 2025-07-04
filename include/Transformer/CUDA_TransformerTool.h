@@ -23,6 +23,8 @@ public:
 
     std::vector<std::string> transform(std::string optimizationString, std::string optimizationIndices);
 
+    void transformOnly();
+
 private:
 
     std::unique_ptr<clang::tooling::CompilationDatabase> Compilations;
