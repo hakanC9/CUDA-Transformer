@@ -6,7 +6,7 @@ void Transformer::addCommand(std::unique_ptr<TransformCommand> command)
     commands.push_back(std::move(command));
 }
 
-void Transformer::getOptimizationChoices(const std::string &choices) // Fix here
+void Transformer::getOptimizationChoices(const std::string &choices)
 {
     for (char c : choices)
     {

@@ -25,6 +25,7 @@ void CUDA_Analyze_ASTConsumer::HandleTranslationUnit(clang::ASTContext &context)
 
 std::string CUDA_Analyze_ASTConsumer::getOptimizationPossibilities(){
 
+
     std::string optPossibilitiesOutput = "";
 
     for (size_t i = 0; i < targetExpressions.syncthreadCalls.size(); i++){

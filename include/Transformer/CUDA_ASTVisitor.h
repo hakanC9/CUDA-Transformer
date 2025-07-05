@@ -23,6 +23,7 @@ class CUDA_ASTVisitor : public clang::RecursiveASTVisitor<CUDA_ASTVisitor>
     // We aim that changed the inside the kernel function(mostly)
     // So we need the ensure the expressions is inside the kernel function not the host functions
     bool isVisitorInsideKernel;
+    bool isVisitorInsideDevice;
     bool isNextIfNested; // Flag to indicate whether the next if statement is nested
 
     bool checkNestedIf(clang::Stmt *stmt);

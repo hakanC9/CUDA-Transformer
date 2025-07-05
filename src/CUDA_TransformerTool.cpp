@@ -154,6 +154,12 @@ std::vector<std::string> CUDA_TransformerTool::analyze(){
         }
     }
 
+    std::cout << "FILES:\n";
+
+    for(auto file:cuFiles){
+        std::cout << file << "\n";
+    }
+
     return CUDA_TransformerTool::analyze(cuFiles);
 }
 
@@ -251,7 +257,6 @@ void CUDA_TransformerTool::transformOnly(){
         }
     }
 
-
     // Extract each individual optimizations
 
     std::stringstream ss(Configurations["index"]);
@@ -267,8 +272,13 @@ void CUDA_TransformerTool::transformOnly(){
     int start = 0;
 
     for (int index : indexVec) {
-        optimizationsToApply.push_back(Configurations["optimization"].substr(start,index));
-        start += index;
+        if(index == 0){
+            optimizationsToApply.push_back("");
+        }
+        else{
+            optimizationsToApply.push_back(Configurations["optimization"].substr(start,index));
+            start += index;            
+        }
     }
 
 
