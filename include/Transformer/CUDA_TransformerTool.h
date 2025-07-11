@@ -4,6 +4,7 @@
 #include "clang/Tooling/CompilationDatabase.h"
 #include "clang/Tooling/Tooling.h"
 
+#include <cstddef>
 #include <memory>
 #include <regex>
 #include <string>
@@ -21,15 +22,15 @@ public:
 
     std::vector<std::string> analyze();
 
-    std::vector<std::string> transform(std::string optimizationString, std::string optimizationIndices);
-
-    void transformOnly();
+    std::vector<std::string> transform(std::string optimizationString);
 
 private:
 
     std::unique_ptr<clang::tooling::CompilationDatabase> Compilations;
 
     std::map<std::string, std::string> Configurations;
+
+    std::string optimization_indices = "";
 
     void compile(const std::string compileOptions, const std::string &directoryPath){
         

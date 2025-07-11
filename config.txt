@@ -1,19 +1,16 @@
-resource_dir=/home/pars/Desktop/llvm-project/build/lib/clang/21
-
-compilation_database_options=-std=c++17;-xcuda;-DRUNONGPU=1;--cuda-gpu-arch=sm_75;-O0
-
-compile_options=-w;-Wno-deprecated-gpu-targets
 
 
-includes=/home/pars/Desktop/grappolo/gpu_graph;/home/pars/Desktop/grappolo/DefineStructure;/usr/local/cuda-12.8/include
+project_path=
+resource_dir=
 
 
-project_path=/home/pars/Desktop/gpu_graph_original
+compilation_database_options=
+compile_options=
+
+
+includes=
+
 
 executable=example
-
 run_options=
-
-optimization=1111111111111111111111111111111111111111111100000000000000000001111111111111111111111111111111111111111111111111111111111111111100000111111111111111111111111111111111111111111111111111111111111111111111
-index=6-0-121-5-0-9-10-2-0-36-12
 

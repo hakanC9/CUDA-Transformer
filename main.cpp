@@ -6,15 +6,11 @@
 int main(int argc, char** arv) {
 
     CUDA_TransformerTool TransformerToolTest;
-
-
     std::vector<std::string> analyzeResults = TransformerToolTest.analyze();
-     
-    for(auto result : analyzeResults){
-        std::cout << result + "\n";
-    }
-
-
-    //TransformerToolTest.transformOnly();
+    TransformerToolTest.transform("111");
 
 }
+
+
+
+

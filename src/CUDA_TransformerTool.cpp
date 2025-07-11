@@ -2,6 +2,7 @@
 #include "clang/Tooling/Tooling.h"
 #include "llvm/Support/raw_ostream.h"
 
+#include <cstdlib>
 #include <string>
 #include <vector>
 #include <fstream>
@@ -54,6 +55,7 @@ std::string parseCompileOptions(std::string line){
 
     return options;
 }
+
 
 /**
  * @brief A helper function that parses config.txt files compile_options key
@@ -125,6 +127,8 @@ CUDA_TransformerTool::CUDA_TransformerTool() {
  */
 std::vector<std::string> CUDA_TransformerTool::analyze(std::vector<std::string> sourcePaths){
 
+    optimization_indices = "";
+
     clang::tooling::ClangTool Tool(*Compilations, sourcePaths);
 
     CUDA_Analyze_FrontendActionFactory Factory;
@@ -136,6 +140,16 @@ std::vector<std::string> CUDA_TransformerTool::analyze(std::vector<std::string> 
         exit(-1);
     }
 
+    std::vector<std::string> optimizationPossibilities = Factory.getOptimizationPossibilities();
+
+    for(auto result : optimizationPossibilities){
+        optimization_indices += std::to_string(result.size()) +  "-";
+    }
+
+    optimization_indices.pop_back();
+
+    std::cout << "\nINDEX\n";
+    std::cout << optimization_indices <<"\n";
     return Factory.getOptimizationPossibilities();
 }
 
@@ -152,12 +166,6 @@ std::vector<std::string> CUDA_TransformerTool::analyze(){
         if (entry.is_regular_file() && entry.path().extension() == ".cu") {
             cuFiles.push_back(entry.path().string());
         }
-    }
-
-    std::cout << "FILES:\n";
-
-    for(auto file:cuFiles){
-        std::cout << file << "\n";
     }
 
     return CUDA_TransformerTool::analyze(cuFiles);
@@ -178,9 +186,15 @@ std::vector<std::string> CUDA_TransformerTool::analyze(){
  * 2 -> Execution Time (t): second
  * 3 -> Power Consumption (P): Watt
 */
-std::vector<std::string> CUDA_TransformerTool::transform(std::string optimizationString, std::string optimizationIndices){
+std::vector<std::string> CUDA_TransformerTool::transform(std::string optimizationString){
 
 
+    if(optimization_indices.empty()){
+        llvm::errs() << "\n Please run analyze() first!\n";
+        exit(-1);
+    }
+
+    
     // Get paths of all cuda files
 
     std::vector<std::string> cuFiles;
@@ -194,7 +208,7 @@ std::vector<std::string> CUDA_TransformerTool::transform(std::string optimizatio
 
     // Extract each individual optimizations
 
-    std::stringstream ss(optimizationIndices);
+    std::stringstream ss(optimization_indices);
 
     std::vector<int> indexVec;
     std::string temp;
@@ -207,8 +221,13 @@ std::vector<std::string> CUDA_TransformerTool::transform(std::string optimizatio
     int start = 0;
 
     for (int index : indexVec) {
-        optimizationsToApply.push_back(optimizationString.substr(start,index));
-        start += index;
+        if(index == 0){
+            optimizationsToApply.push_back("");
+        }
+        else{
+            optimizationsToApply.push_back(Configurations["optimization"].substr(start,index));
+            start += index;            
+        }
     }
 
 
@@ -224,6 +243,7 @@ std::vector<std::string> CUDA_TransformerTool::transform(std::string optimizatio
         llvm::errs() << "Error running transform!\n";
         exit(-1);
     }
+
 
     // Compile, run and use depo tool on transformed files
     
@@ -243,9 +263,13 @@ std::vector<std::string> CUDA_TransformerTool::transform(std::string optimizatio
 }
 
 
-
 void CUDA_TransformerTool::transformOnly(){
 
+
+    if(optimization_indices.empty()){
+        llvm::errs() << "\n Please run analyze() first!\n";
+        exit(-1);
+    }
 
     // Get paths of all cuda files
 
@@ -259,7 +283,7 @@ void CUDA_TransformerTool::transformOnly(){
 
     // Extract each individual optimizations
 
-    std::stringstream ss(Configurations["index"]);
+    std::stringstream ss(optimization_indices);
 
     std::vector<int> indexVec;
     std::string temp;
@@ -296,3 +320,4 @@ void CUDA_TransformerTool::transformOnly(){
     }
 
 }
+
