@@ -225,7 +225,7 @@ std::vector<std::string> CUDA_TransformerTool::transform(std::string optimizatio
             optimizationsToApply.push_back("");
         }
         else{
-            optimizationsToApply.push_back(Configurations["optimization"].substr(start,index));
+            optimizationsToApply.push_back(optimizationString.substr(start,index));
             start += index;            
         }
     }
@@ -264,3 +264,103 @@ std::vector<std::string> CUDA_TransformerTool::transform(std::string optimizatio
 
 
 
+
+
+std::vector<std::string> CUDA_TransformerTool::transformOnly(){
+
+    if(optimization_indices.empty()){
+        llvm::errs() << "\n Please run analyze() first!\n";
+        exit(-1);
+    }
+
+    // Get paths of all cuda files
+
+    std::vector<std::string> cuFiles;
+
+    for (const auto &entry : std::filesystem::recursive_directory_iterator(Configurations["project_path"])) {
+        if (entry.is_regular_file() && entry.path().extension() == ".cu") {
+            cuFiles.push_back(entry.path().string());
+        }
+    }
+
+
+    // Extract each individual optimizations
+
+    std::stringstream ss(optimization_indices);
+
+    std::vector<int> indexVec;
+    std::string temp;
+
+    while(std::getline(ss, temp, '-')){
+        indexVec.push_back(std::stoi(temp));
+    }
+
+    std::vector<std::string> optimizationsToApply;
+    int start = 0;
+
+    for (int index : indexVec) {
+        if(index == 0){
+            optimizationsToApply.push_back("");
+        }
+        else{
+            optimizationsToApply.push_back(Configurations["optimization"].substr(start,index));
+            start += index;            
+        }
+    }
+
+
+    // Run the tool
+
+    clang::tooling::ClangTool Tool(*Compilations, cuFiles);
+
+    CUDA_Transform_FrontendActionFactory Factory(optimizationsToApply);
+
+    int result = Tool.run(&Factory);
+
+    if (result != 0){
+        llvm::errs() << "Error running transform!\n";
+        exit(-1);
+    }
+
+
+    // Compile only
+    
+    compile(parseCompileOptions(Configurations["compile_options"]), "temp_results");
+
+    std::vector<std::string> results;
+    return results;
+}
+
+
+std::vector<std::string> CUDA_TransformerTool::transformSingle(){
+
+    if(optimization_indices.empty()){
+        llvm::errs() << "\n Please run analyze() first!\n";
+        exit(-1);
+    }
+
+    std::vector<std::string> cuFiles = {Configurations["transform_single"]};
+
+    std::vector<std::string> optimizationsToApply = {Configurations["optimizaton"]};
+
+    // Run the tool
+
+    clang::tooling::ClangTool Tool(*Compilations, cuFiles);
+
+    CUDA_Transform_FrontendActionFactory Factory(optimizationsToApply);
+
+    int result = Tool.run(&Factory);
+
+    if (result != 0){
+        llvm::errs() << "Error running transform!\n";
+        exit(-1);
+    }
+
+    // Compile only
+    
+    compile(parseCompileOptions(Configurations["compile_options"]), "temp_results");
+
+    std::vector<std::string> results;
+    return results;   
+
+}

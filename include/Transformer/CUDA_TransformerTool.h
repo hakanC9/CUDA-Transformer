@@ -24,6 +24,10 @@ public:
 
     std::vector<std::string> transform(std::string optimizationString);
 
+    std::vector<std::string> transformOnly();
+
+    std::vector<std::string> transformSingle();
+
 private:
 
     std::unique_ptr<clang::tooling::CompilationDatabase> Compilations;

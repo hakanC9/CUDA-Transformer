@@ -7,8 +7,19 @@ int main(int argc, char** arv) {
 
     CUDA_TransformerTool TransformerToolTest;
     std::vector<std::string> analyzeResults = TransformerToolTest.analyze();
-    TransformerToolTest.transform("111");
+    
+    for(auto result:analyzeResults){
+        if(result.empty()){
+            std::cout << "-1\n";
+        }
+        else{
+            std::cout << result << "\n";
+        }
+    }
 
+    //TransformerToolTest.transformOnly();
+
+    //TransformerToolTest.transformSingle();
 }
 
 

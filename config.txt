@@ -1,5 +1,4 @@
 
-
 project_path=
 resource_dir=
 
@@ -11,6 +10,9 @@ compile_options=
 includes=
 
 
-executable=example
+executable=
 run_options=
 
+optimization=
+
+transform_single=
