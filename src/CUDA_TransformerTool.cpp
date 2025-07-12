@@ -251,7 +251,7 @@ std::vector<std::string> CUDA_TransformerTool::transform(std::string optimizatio
 
     std::vector<std::string> results;
 
-    std::string executionResult = run(Configurations["executable"], Configurations["run_options"]);
+    std::string executionResult = run(Configurations["executable"], parseCompileOptions(Configurations["run_options"]));
     std::string depoExecutionResult = runDepoTool(Configurations["executable"]);
 
     std::vector<std::string> depoResult = getDepoResults(depoExecutionResult);

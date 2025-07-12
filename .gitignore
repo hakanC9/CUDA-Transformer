@@ -3,3 +3,4 @@ analyzeBin/
 .vscode/
 .clangd
 .cache/
+.config.txt
