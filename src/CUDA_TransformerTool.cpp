@@ -225,7 +225,7 @@ std::vector<std::string> CUDA_TransformerTool::transform(std::string optimizatio
             optimizationsToApply.push_back("");
         }
         else{
-            optimizationsToApply.push_back(Configurations["optimization"].substr(start,index));
+            optimizationsToApply.push_back(optimizationString.substr(start,index));
             start += index;            
         }
     }
