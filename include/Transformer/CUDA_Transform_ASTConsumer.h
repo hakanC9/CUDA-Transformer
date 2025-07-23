@@ -1,5 +1,4 @@
-#ifndef CUDA_TRANSFORM_AST_CONSUMER_H
-#define CUDA_TRANSFORM_AST_CONSUMER_H
+#pragma once
 
 #include "clang/AST/ASTConsumer.h"
 
@@ -30,5 +29,3 @@ class CUDA_Transform_ASTConsumer : public clang::ASTConsumer{
       
 
 };
-
-#endif

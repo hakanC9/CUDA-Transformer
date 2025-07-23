@@ -1,5 +1,4 @@
-#ifndef CUDA_TRANSFORM_FRONTENDACTION_H
-#define CUDA_TRANSFORM_FRONTENDACTION_H
+#pragma once
 
 #include "clang/Frontend/FrontendAction.h"
 #include "clang/Rewrite/Core/Rewriter.h"
@@ -14,7 +13,7 @@
 class CUDA_Transform_FrontendAction : public clang::ASTFrontendAction {
 
     public:
-        CUDA_Transform_FrontendAction(std::string optChoices);
+        CUDA_Transform_FrontendAction(std::string optChoices, std::string& optimizationString);
 
         std::unique_ptr<clang::ASTConsumer> CreateASTConsumer(
             clang::CompilerInstance &Compiler,
@@ -29,6 +28,5 @@ class CUDA_Transform_FrontendAction : public clang::ASTFrontendAction {
         Transformer transformer;
         
         std::string OptChoices;
+        std::string& optimizationString;
 };
-
-#endif

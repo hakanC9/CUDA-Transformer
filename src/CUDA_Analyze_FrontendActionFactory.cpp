@@ -1,4 +1,5 @@
 #include "Transformer/CUDA_Analyze_FrontendActionFactory.h"
+#include <string>
 
 
 CUDA_Analyze_FrontendActionFactory::CUDA_Analyze_FrontendActionFactory(){

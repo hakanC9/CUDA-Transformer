@@ -13,8 +13,8 @@ find_package(Clang REQUIRED CONFIG)
 message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
 message(STATUS "Found CLANG ${CLANG_PACKAGE_VERSION}")
 
-#set(LLVM_DIR "/home/pars/Desktop/llvm-project")     # Needs to be configured for different systems
-set(LLVM_DIR "../llvm-project")
+set(LLVM_DIR "/home/pars/Desktop/llvm-project")     # Needs to be configured for different systems
+
 add_executable(CUDATransformer                      # Needs to be changed to add library (static/shared)
     main.cpp                                        # Needs to be removed for standalone (library) use
     src/CUDA_TransformerTool.cpp
@@ -40,6 +40,10 @@ add_executable(CUDATransformer                      # Needs to be changed to add
     src/Commands/ChooseIfElseBranch.cpp
     src/Commands/ReplaceDoubleWithFloat.cpp
     src/Commands/LoopPerforation.cpp
+
+    src/Helper/ConfigParser.cpp
+    src/Helper/DefaultEvaluator.cpp
+    src/Helper/Logger.cpp
 )
 
 target_include_directories(CUDATransformer

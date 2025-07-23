@@ -1,3 +1,5 @@
+#pragma once
+
 #include "Commands/TransformCommand.h"
 #include <queue>
 #include "clang/Lex/Lexer.h"

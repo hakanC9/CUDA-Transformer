@@ -1,5 +1,4 @@
-#ifndef OPTIMIZATION_COMMAND_H
-#define OPTIMIZATION_COMMAND_H
+#pragma once
 
 #include "clang/Rewrite/Core/Rewriter.h"
 #include "clang/AST/Expr.h"
@@ -13,4 +12,3 @@ class TransformCommand
         virtual void execute() = 0;
 };
 
-#endif

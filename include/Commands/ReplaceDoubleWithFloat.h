@@ -1,3 +1,5 @@
+#pragma once
+
 #include "Commands/TransformCommand.h"
 #include "clang/AST/TypeLoc.h"
 

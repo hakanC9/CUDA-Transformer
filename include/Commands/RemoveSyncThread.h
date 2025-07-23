@@ -1,6 +1,4 @@
-// RemoveSyncThreadsCommand.h
-#ifndef REMOVE_SYNC_THREAD_H
-#define REMOVE_SYNC_THREAD_H
+#pragma once
 
 #include "Commands/TransformCommand.h"
 
@@ -15,4 +13,4 @@ class RemoveSyncThread : public TransformCommand
     void execute() override;
 };
 
-#endif
+

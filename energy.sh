@@ -8,6 +8,7 @@ fi
 
 # Define the executable to be run
 EXECUTABLE=$1
+shift
 
 # Define the paths
 DEPO_DIR="/home/pars/Desktop/split"       # Needs to be configured for different systems
@@ -18,14 +19,13 @@ TARGET_CONFIG_YAML="$CURRENT_DIR/config.yaml"
 # Copy config.yaml to the current directory (where the user runs the script)
 if [ -f "$CONFIG_YAML" ]; then
   cp "$CONFIG_YAML" "$TARGET_CONFIG_YAML"
-  echo "config.yaml copied to $CURRENT_DIR"
 else
   echo "config.yaml not found in $DEPO_DIR"
   exit 1
 fi
 
 # Define the DEPO command with the updated path and flags
-DEPO_COMMAND="sudo /home/pars/Desktop/split/build/apps/DEPO/DEPO --no-tuning --gpu 0 $EXECUTABLE"     # Needs to be configured for different systems
+DEPO_COMMAND="sudo /home/pars/Desktop/split/build/apps/DEPO/DEPO --no-tuning --gpu 0 $EXECUTABLE $@"     # Needs to be configured for different systems
 
 # Run the DEPO tool and capture the output
 OUTPUT=$(eval "$DEPO_COMMAND")

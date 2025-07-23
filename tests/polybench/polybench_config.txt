@@ -1,0 +1,31 @@
+// absolute path to target project
+project_path=/home/pars/Desktop/PolyBench-ACC/CUDA/stencils/convolution-2d
+
+
+// absolute path to clang installation
+resource_dir=/home/pars/Desktop/llvm-project/build/lib/clang/21
+
+
+// options for creating fixed compilation database, semi-column seperated
+compilation_database_options=-w;-Wno-deprecated-gpu-targets
+
+
+// compile options to apply, semi-column seperated
+compile_options=-w;-Wno-deprecated-gpu-targets
+
+
+// absolute path to includes directories, semi-column seperated
+includes=/home/pars/Desktop/PolyBench-ACC/CUDA/utilities;/home/pars/Desktop/PolyBench-ACC/CUDA/stencils/convolution-2d
+
+
+// name of the executable
+main=2DConvolution.cu
+
+
+// run options to apply, semi-column seperated
+run_options=
+
+
+// 0 for direct console output comparison (std::cout) 1 for custom comparison
+comparison_type=0
+

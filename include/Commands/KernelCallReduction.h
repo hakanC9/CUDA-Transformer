@@ -1,5 +1,4 @@
-#ifndef KERNEL_CALL_REDUCTION_H
-#define KERNEL_CALL_REDUCTION_H
+#pragma once
 
 #include "Commands/TransformCommand.h"
 #include "clang/AST/ExprCXX.h"
@@ -20,4 +19,3 @@ class KernelCallReduction : public TransformCommand
     void execute() override;
 };
 
-#endif

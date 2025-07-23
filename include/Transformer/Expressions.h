@@ -1,5 +1,4 @@
-#ifndef EXPRESSIONS_H
-#define EXPRESSIONS_H
+#pragma once
 
 #include "clang/AST/Expr.h"
 #include "clang/AST/ExprCXX.h"
@@ -22,5 +21,3 @@ class Expressions
 
   
 };
-
-#endif

@@ -42,7 +42,6 @@ void LoopPerforation::execute()
     std::string incStr = clang::Lexer::getSourceText(
         clang::CharSourceRange::getCharRange(incRange), SM, LangOpts).str();
 
-    llvm::errs() << "Original increment: [" << incStr << "]\n";
 
     std::string newIncStr;
     std::smatch match;
@@ -98,8 +97,6 @@ void LoopPerforation::execute()
         llvm::errs() << "SKIPPED: unsupported increment format: [" << incStr << "]\n";
         return;
     }
-
-    llvm::errs() << "Transformed increment: [" << newIncStr << "]\n";
 
     // Replace the original increment expression
     rewriter.ReplaceText(incRange, newIncStr);

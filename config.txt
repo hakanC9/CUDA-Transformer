@@ -1,18 +1,31 @@
-
-project_path=
-resource_dir=
-
-
-compilation_database_options=
-compile_options=
+// absolute path to target project
+project_path=/home/pars/Desktop/gpu_graph_original
 
 
-includes=
+// absolute path to clang installation
+resource_dir=/home/pars/Desktop/llvm-project/build/lib/clang/21
 
 
-executable=
-run_options=
+// options for creating fixed compilation database, semi-column seperated
+compilation_database_options=-w;-Wno-deprecated-gpu-targets;-std=c++17;-xcuda;-DRUNONGPU=1;--cuda-gpu-arch=sm_75;
 
-optimization=
 
-transform_single=
+// compile options to apply, semi-column seperated
+compile_options=-w;-Wno-deprecated-gpu-targets;-std=c++17;-DRUNONGPU=1;
+
+
+// absolute path to includes directories, semi-column seperated
+includes=/home/pars/Desktop/gpu_graph_original;/home/pars/Desktop/grappolo/DefineStructure;/usr/local/cuda-12.8/include;/usr/local/cuda-12.8/targets/x86_64-linux/include
+
+
+// name of the executable
+main=gpu_main.cpp
+
+
+// run options to apply, semi-column seperated
+run_options=-p 100 -f 5 /home/pars/Desktop/live_CUDATransformer/tests/grappolo/karateApprox100.graph -b 0 -o >> denemetransformed.txt
+
+
+// 0 for direct console output comparison (std::cout) 1 for custom comparison
+comparison_type=0
+
