@@ -3,9 +3,11 @@
 #include "clang/Frontend/CompilerInstance.h"
 
 CUDA_Transform_FrontendAction::CUDA_Transform_FrontendAction(
-    std::string optChoices)
+    std::string optChoices,
+    std::string& optimizationString)
     : 
-    OptChoices(optChoices)
+    OptChoices(optChoices),
+    optimizationString(optimizationString)
     {}
 
 
@@ -32,18 +34,18 @@ void CUDA_Transform_FrontendAction::EndSourceFileAction(){
     const clang::FileEntryRef &EntryRef = *EntryRefOrErr;
     std::string originalFileName = std::filesystem::path(EntryRef.getName().str()).filename().string();
 
-    std::string resultDir = "temp_results";
+    std::filesystem::path baseDir = "temp_results";
+    std::filesystem::path optDir = baseDir / optimizationString;
+
     std::error_code ec;
-    if (!std::filesystem::exists(resultDir)) {
-        if (!std::filesystem::create_directory(resultDir, ec)) {
-            llvm::errs() << "Error creating directory 'temp_results': " << ec.message() << "\n";
-            return;
-        }
+    std::filesystem::create_directories(optDir, ec);
+    if (ec) {
+        llvm::errs() << "Error creating directory '" << optDir << "': " << ec.message() << "\n";
+        return;
     }
 
-    std::filesystem::path outputPath = std::filesystem::path(resultDir) / originalFileName;
+    std::filesystem::path outputPath = optDir / originalFileName;
 
-    
     llvm::raw_fd_ostream outFile(outputPath.string(), ec, llvm::sys::fs::OF_None);
     if (ec) {
         llvm::errs() << "Error opening file " << outputPath << ": " << ec.message() << "\n";

@@ -1,5 +1,4 @@
-#ifndef CUDA_AST_VISITOR_H
-#define CUDA_AST_VISITOR_H
+#pragma once
 
 #include "clang/AST/ASTTypeTraits.h"
 #include "clang/AST/ParentMap.h"
@@ -42,4 +41,3 @@ class CUDA_ASTVisitor : public clang::RecursiveASTVisitor<CUDA_ASTVisitor>
     Expressions &targetExpressions;
 };
 
-#endif

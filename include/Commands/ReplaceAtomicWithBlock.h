@@ -1,6 +1,4 @@
-// ReplaceSyncWithWarpCommand.h
-#ifndef REPLACE_ATOMIC_WITH_BLOCK_H
-#define REPLACE_ATOMIC_WITH_BLOCK_H
+#pragma once
 
 #include "Commands/TransformCommand.h"
 #include "clang/Lex/Lexer.h"
@@ -17,4 +15,3 @@ class ReplaceAtomicWithBlock : public TransformCommand
     void execute() override;
 };
 
-#endif

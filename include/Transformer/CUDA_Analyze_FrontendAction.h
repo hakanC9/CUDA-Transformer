@@ -1,5 +1,4 @@
-#ifndef CUDA_ANALYZE_FRONTENDACTION_H
-#define CUDA_ANALYZE_FRONTENDACTION_H
+#pragma once
 
 
 #include "clang/Frontend/FrontendAction.h"
@@ -29,6 +28,3 @@ class CUDA_Analyze_FrontendAction : public clang::ASTFrontendAction {
 
 };
 
-
-
-#endif

@@ -1,6 +1,4 @@
-#ifndef CUDA_TRANSFORM_FRONTENDACTION_FACTORY_H
-#define CUDA_TRANSFORM_FRONTENDACTION_FACTORY_H
-
+#pragma once
 
 #include "clang/Tooling/Tooling.h"
 
@@ -8,7 +6,7 @@
 class CUDA_Transform_FrontendActionFactory : public clang::tooling::FrontendActionFactory {
     public:
 
-        explicit CUDA_Transform_FrontendActionFactory(std::vector<std::string> optimizationsToApply);
+        explicit CUDA_Transform_FrontendActionFactory(std::vector<std::string> optimizationsToApply, std::string& optimizationString);
     
         std::unique_ptr<clang::FrontendAction> create() override;
         
@@ -16,7 +14,7 @@ class CUDA_Transform_FrontendActionFactory : public clang::tooling::FrontendActi
 
         int optimizationIndex = 0;
         std::vector<std::string> optimizationsToApply;
+        std::string& optimizationString;
     };
 
 
-#endif

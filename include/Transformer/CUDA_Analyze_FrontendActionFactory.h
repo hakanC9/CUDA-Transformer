@@ -1,5 +1,4 @@
-#ifndef CUDA_ANALYZE_FRONTENDACTION_FACTORY_H
-#define CUDA_ANALYZE_FRONTENDACTION_FACTORY_H
+#pragma once
 
 
 #include "clang/Tooling/Tooling.h"
@@ -19,7 +18,7 @@ class CUDA_Analyze_FrontendActionFactory : public clang::tooling::FrontendAction
     private:
     
         std::shared_ptr<std::vector<std::string>>  optimizationPossibilities;
+
     };
 
 
-#endif

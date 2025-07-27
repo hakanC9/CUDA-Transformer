@@ -1,5 +1,4 @@
-#ifndef REPLACE_SYNC_WITH_TILE_H
-#define REPLACE_SYNC_WITH_TILE_H
+#pragma once
 
 #include "Commands/TransformCommand.h"
 #include "clang/Basic/SourceManager.h"
@@ -16,4 +15,3 @@ class ReplaceSyncThreadWithTile : public TransformCommand
     void execute() override;
 };
 
-#endif

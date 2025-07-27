@@ -1,6 +1,4 @@
-// ReplaceSyncWithWarpCommand.h
-#ifndef REPLACE_SYNC_WITH_WARP_H
-#define REPLACE_SYNC_WITH_WARP_H
+#pragma once
 
 #include "Commands/TransformCommand.h"
 
@@ -15,4 +13,3 @@ class ReplaceSyncWithWarp : public TransformCommand
     void execute() override;
 };
 
-#endif

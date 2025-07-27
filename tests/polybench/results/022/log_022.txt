@@ -1,0 +1,13 @@
+setting device 0 with name Quadro T1000
+GPU Time in seconds:
+0.000083
+CPU Time in seconds:
+0.197576
+Non-Matching CPU-GPU Outputs Beyond Error Threshold of 0.05 Percent: 16524111
+
+=============================
+19.1091
+=============================
+1.325
+=============================
+14.422

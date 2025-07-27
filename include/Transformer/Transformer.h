@@ -1,5 +1,4 @@
-#ifndef TRANSFORMER_H
-#define TRANSFORMER_H
+#pragma once
 
 #include <iostream>
 #include <string>
@@ -48,5 +47,3 @@ class Transformer
 
 
 };
-
-#endif

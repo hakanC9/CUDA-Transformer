@@ -1,3 +1,5 @@
+#pragma once
+
 #include "Commands/TransformCommand.h"
 
 class LoopPerforation : public TransformCommand
