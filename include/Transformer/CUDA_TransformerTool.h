@@ -33,11 +33,15 @@ private:
 
     std::string optimization_indices = "";
 
-    void compile(const std::string compileOptions, const std::string &directoryPath);
-
-    std::vector<std::string> run(std::string& optimizationString, std::string runOptions);
+    std::vector<std::string> run(std::string& optimizationString);
 
     std::vector<std::string> getDepoResults(std::string depoOutputString);
     
     std::string readProgramOutput();
+
+    void copyTransformedToOriginal(std::string& optimizationString);
+
+    void saveOriginal();
+
+    void revertToOriginal();
 };

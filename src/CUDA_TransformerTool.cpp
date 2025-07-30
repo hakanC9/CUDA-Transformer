@@ -18,8 +18,7 @@
 #include "Transformer/CUDA_Analyze_FrontendActionFactory.h"
 #include "Transformer/CUDA_Transform_FrontendActionFactory.h"
 
-
-
+#include <boost/process.hpp>
 
 CUDA_TransformerTool::CUDA_TransformerTool() {
 
@@ -38,7 +37,6 @@ CUDA_TransformerTool::CUDA_TransformerTool() {
     }
 
     Compilations = std::make_unique<clang::tooling::FixedCompilationDatabase>(".", compileFlags);
-
 }
 
 
@@ -92,7 +90,7 @@ std::vector<std::string> CUDA_TransformerTool::analyze(){
  * @param optimizationString    A string of optimization to apply for each target file (example: 11111111)
  *
  * @return std::vector<string> : 
- * 0 -> Execution Result: Unknown
+ * 0 -> Execution Result: Varying
  * 1 -> Energy Consumption (E): Joule
  * 2 -> Execution Time (t): second
  * 3 -> Power Consumption (P): Watt
@@ -105,29 +103,27 @@ std::vector<std::string> CUDA_TransformerTool::transform(std::string optimizatio
         exit(-1);
     }
 
+    // Commented-out until proper evaluator implementation
+
     // if(!evaluator){
     //     llvm::errs() << "\n Please set an evaluator for accuracy!\n";
     //     exit(-1);
     // }
 
+
+    // Temporarily save the original target project
+    saveOriginal();
+
     // Get paths of all cuda files
-
     std::vector<std::string> cuFiles;
-
-    std::string pathToMain = "";
 
     for (const auto &entry : std::filesystem::recursive_directory_iterator(Configurations["project_path"])) {
         if (entry.is_regular_file() && entry.path().extension() == ".cu") {
             cuFiles.push_back(entry.path().string());
         }
-
-        if(entry.path().extension() != ".cu" && entry.path().filename() == Configurations["main"]){
-            pathToMain = entry.path().string();
-        }
     }
 
     // Extract each individual optimizations
-
     std::stringstream ss(optimization_indices);
 
     std::vector<int> indexVec;
@@ -150,8 +146,8 @@ std::vector<std::string> CUDA_TransformerTool::transform(std::string optimizatio
         }
     }
 
-    // Run the tool
 
+    // Run the tool
     clang::tooling::ClangTool Tool(*Compilations, cuFiles);
 
     CUDA_Transform_FrontendActionFactory Factory(optimizationsToApply, optimizationString);
@@ -163,17 +159,30 @@ std::vector<std::string> CUDA_TransformerTool::transform(std::string optimizatio
         exit(-1);
     }
 
-    // Copy main file to temp_results directory
-    if(pathToMain != ""){
-        std::filesystem::copy(pathToMain,"temp_results/" + optimizationString);
+    // Change original files with transformed files
+    copyTransformedToOriginal(optimizationString);
+
+
+    std::string commandString = "cd \"" + Configurations["project_path"]+ "\" && " + Configurations["commands"];
+    try {
+
+        int ret = boost::process::system("/bin/bash", "-c", commandString);
+
+        if (ret != 0) {
+            std::cerr << "[Error] Command sequence failed with code: " << ret << "\n";
+            exit(-1);
+        }
+
+        std::cout << "All commands executed successfully.\n";
+    } catch (const std::exception& e) {
+        std::cerr << "[Exception] " << e.what() << "\n";
+        exit(-1);
     }
-    std::cout << "\n PATH TO MAIN: " << pathToMain << "\n";
-    // Compile, run and use depo tool on transformed files
-
-    std::string compOpt = Configurations["compile_options"]+" "+Configurations["includes"]; 
-    compile(compOpt, "temp_results");
-
-    return run(optimizationString, Configurations["run_options"] );
+    
+    // Change transformed files with original files
+    revertToOriginal();
+    
+    return run(optimizationString);
 }
 
 
@@ -185,57 +194,22 @@ void CUDA_TransformerTool::setAccuracyEvaluator(std::unique_ptr<AccuracyEvaluato
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-void CUDA_TransformerTool::compile(const std::string compileOptions, const std::string &directoryPath){
-    
-    std::vector<std::string> cuFiles;
-
-    std::string mainFile = "";
-
-    for (const auto &entry : std::filesystem::recursive_directory_iterator(directoryPath)) {
-        if (entry.is_regular_file() && entry.path().extension() == ".cu") {
-            cuFiles.push_back(entry.path().string());
-        }
-        if(entry.path().extension() != ".cu" && entry.path().filename() == Configurations["main"]){
-            mainFile = entry.path().string();
-        }
-
-    }
-    for(auto cuFile : cuFiles){
-        // change .cu to .o
-        std::string executableName = cuFile.substr(0, cuFile.size() - 3) + ".o";
-        
-        // create the command
-        std::string command = "nvcc " + cuFile + " -o " + executableName + " " + compileOptions;
-        
-        // run the command
-        int result = std::system(command.c_str());
-    
-        if (result != 0) {
-            std::cerr << "Compilation failed with code: " << result << std::endl;
-        }
-    }
-    if(!mainFile.empty()){
-        
-        std::string mainName = mainFile.substr(0, mainFile.rfind(".")) + ".o";
-        
-        std::string command = "clang++ " + mainFile + " -o " + mainName;
-
-        int result = std::system(command.c_str());
-    
-        if (result != 0) {
-            std::cerr << "Compilation of main failed with code: " << result << std::endl;
-        }
-    }
-}
-
-
-std::vector<std::string> CUDA_TransformerTool::run(std::string& optimizationString, std::string runOptions){
+/**
+ * @brief A function to run the depo tool with target executable for calculating power metrics
+ * 
+ * @param optimizationString    Optimization string to run the target executable under temp_results/{optimizationString}
+ * @return std::vector<string> : 
+ * 0 -> Execution Result: Varying
+ * 1 -> Energy Consumption (E): Joule
+ * 2 -> Execution Time (t): second
+ * 3 -> Power Consumption (P): Watt
+ */
+std::vector<std::string> CUDA_TransformerTool::run(std::string& optimizationString){
     
     std::cout << "\nExecuting the depo...\n";
 
-
-    std::string main = Configurations["main"].substr(0, Configurations["main"].rfind(".")) + ".o";
-    std::string command = "sudo ../energy.sh temp_results/"+ optimizationString+ "/" + main + " " + runOptions;
+    // Adding run options are commented-out until proper bug fix
+    std::string command = "sudo ../energy.sh "+ Configurations["executable_path"] + " " ;//+ Configurations["run_options"];
 
     std::array<char, 128> buffer;
     std::stringstream executionResult;
@@ -267,6 +241,66 @@ std::vector<std::string> CUDA_TransformerTool::run(std::string& optimizationStri
 }
 
 
+/**
+ * @brief A function that overwrites target projects files with transformed files
+ */
+void CUDA_TransformerTool::copyTransformedToOriginal(std::string& optimizationString) {
+
+    std::filesystem::copy(
+        "temp_results/" + optimizationString,
+        Configurations["project_path"],
+        std::filesystem::copy_options::overwrite_existing | std::filesystem::copy_options::recursive
+    );
+}
+
+
+/**
+ * @brief A function that temporarily saves the target projects unchanged files
+ */
+void CUDA_TransformerTool::saveOriginal(){
+
+    try {
+        if (std::filesystem::exists("temp_save")) {
+            std::filesystem::remove_all("temp_save");
+        }
+
+        std::filesystem::copy(
+            Configurations["project_path"],
+            "temp_save",
+            std::filesystem::copy_options::recursive
+        );
+
+    } catch (const std::filesystem::filesystem_error& e) {
+        std::cerr << "Error copying original files: " << e.what() << std::endl;
+    }
+}
+
+
+/**
+ * @brief A function that reverts the changes on the target project
+ */
+void CUDA_TransformerTool::revertToOriginal(){
+
+    std::filesystem::copy(
+        "temp_save",
+        Configurations["project_path"],
+        std::filesystem::copy_options::overwrite_existing | std::filesystem::copy_options::recursive
+    );
+
+    std::filesystem::remove_all("temp_save");
+}
+
+
+/**
+ * @brief A function to parse DEPO Tool's output
+ * 
+ * @param depoOutputString    DEPO Tool's ouput
+ *
+ * @return std::vector<string> : 
+ * 0 -> Energy Consumption (E): Joule
+ * 1 -> Execution Time (t): second
+ * 2 -> Power Consumption (P): Watt
+ */
 std::vector<std::string> CUDA_TransformerTool::getDepoResults(std::string depoOutputString) {
     std::vector<std::string> values;
     std::smatch match;
@@ -294,6 +328,11 @@ std::vector<std::string> CUDA_TransformerTool::getDepoResults(std::string depoOu
 }
 
 
+/**
+ * @brief A function that reads EP_stdout.txt file generated from DEPO Tool for target projects' output
+ * 
+ * @return std::string Read output
+ */
 std::string CUDA_TransformerTool::readProgramOutput() {
 
     std::ifstream file("EP_stdout.txt");

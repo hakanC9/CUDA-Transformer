@@ -9,6 +9,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 #find_package(LLVM REQUIRED CONFIG)
 find_package(Clang REQUIRED CONFIG)
+find_package(Boost REQUIRED)
 
 message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
 message(STATUS "Found CLANG ${CLANG_PACKAGE_VERSION}")
@@ -66,6 +67,7 @@ target_link_libraries(CUDATransformer
     clangSerialization
     clangTooling
     clangEdit
+    Boost::boost
     #${LLVM_LIBS}    # Can be redundant but still safe to include since a lot of clang components initially needs llvm
 )
 

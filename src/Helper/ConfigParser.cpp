@@ -1,7 +1,6 @@
 #include "Helper/ConfigParser.h"
 
 #include <cstdlib>
-#include <iostream>
 #include <string>
 #include <vector>
 #include <fstream>
@@ -20,6 +19,10 @@ std::map<std::string, std::string> ConfigParser::readConfig() {
     while (std::getline(file, line)) {
 
         if (!line.empty() && line[0] == '/'){
+            continue;
+        }
+        
+        if (!line.empty() && line[0] == '='){
             continue;
         }
         
@@ -96,3 +99,4 @@ std::vector<std::string> ConfigParser::parseWhitespace(std::string line){
 
     return values;
 }
+
