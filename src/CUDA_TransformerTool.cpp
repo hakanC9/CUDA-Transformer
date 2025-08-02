@@ -179,10 +179,13 @@ std::vector<std::string> CUDA_TransformerTool::transform(std::string optimizatio
         exit(-1);
     }
     
+
+    std::vector<std::string> outputs = run(optimizationString);
+
     // Change transformed files with original files
     revertToOriginal();
     
-    return run(optimizationString);
+    return outputs;
 }
 
 
@@ -209,7 +212,7 @@ std::vector<std::string> CUDA_TransformerTool::run(std::string& optimizationStri
     std::cout << "\nExecuting the depo...\n";
 
     // Adding run options are commented-out until proper bug fix
-    std::string command = "sudo ../energy.sh "+ Configurations["executable_path"] + " " ;//+ Configurations["run_options"];
+    std::string command = "sudo ./energy.sh "+ Configurations["executable_path"] + " " ;//+ Configurations["run_options"];
 
     std::array<char, 128> buffer;
     std::stringstream executionResult;
@@ -280,6 +283,10 @@ void CUDA_TransformerTool::saveOriginal(){
  * @brief A function that reverts the changes on the target project
  */
 void CUDA_TransformerTool::revertToOriginal(){
+
+    for (const auto& entry : std::filesystem::directory_iterator(Configurations["project_path"])) {
+        std::filesystem::remove_all(entry.path());
+    }
 
     std::filesystem::copy(
         "temp_save",

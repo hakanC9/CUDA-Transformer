@@ -13,7 +13,7 @@
 */
 std::map<std::string, std::string> ConfigParser::readConfig() {
     std::map<std::string, std::string> configMap;
-    std::ifstream file("../config.txt");
+    std::ifstream file("config.txt");
     std::string line;
     
     while (std::getline(file, line)) {

@@ -7,14 +7,15 @@
 /*
 * Example usage of the tool
 */
-int main(int argc, char** arv) {
+int main(int argc, char** argv) {
+
 
     CUDA_TransformerTool TransformerToolTest;
     Logger logger;
     
     std::vector<std::string> analyzeResults = TransformerToolTest.analyze();
 
-    std::cout << "\nANALYZE OUTPUT:\n" << analyzeResults[0];
+    std::cout << "\nANALYZE OUTPUT:\n" << analyzeResults[0] << "\n";
 
 
     std::vector<std::string> optimizatons = {"100", "010", "001", "110", "101","011", 
@@ -25,6 +26,7 @@ int main(int argc, char** arv) {
     for(auto optimzation:optimizatons){
         logger.log(TransformerToolTest.transform(optimzation), optimzation);
     }
+
 }
 
 
