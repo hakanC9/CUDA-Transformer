@@ -33,7 +33,6 @@ CUDA_TransformerTool::CUDA_TransformerTool() {
     }    
     
     for(auto inc : parser.parseWhitespace(Configurations["includes"])){
-        std::cout  << inc << "\n";
         compileFlags.push_back(inc);
     }
 
