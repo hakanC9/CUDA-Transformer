@@ -19,6 +19,7 @@ set(LLVM_DIR "/home/pars/Desktop/llvm-project")     # Needs to be configured for
 
 option ( TEST_GRAPPOLO "Test code for grappolo project" ON)
 option ( TEST_POLYBENCH "Test code for polybench's convolution2d project" ON)
+option ( TEST_GARDENIA "Test code for gardenia's bc_linear_base.cu file" ON)
 
 set ( 
     TOOL_INCLUDES 
@@ -123,3 +124,8 @@ IF ( TEST_POLYBENCH )
     MESSAGE ( "Test code for polybench is set to be built" )
     add_subdirectory ( tests/polybench )
 ENDIF ( TEST_POLYBENCH )
+
+IF ( TEST_GARDENIA )
+    MESSAGE ( "Test code for gardenia is set to be built" )
+    add_subdirectory ( tests/gardenia )
+ENDIF ( TEST_GARDENIA )

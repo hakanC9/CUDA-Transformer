@@ -81,7 +81,6 @@ std::string  ConfigParser::parseIncludes(std::string line){
     while(std::getline(ss, temp, ';')){
         includes += "-I" + temp + " ";
     }
-
     return includes.substr(0, includes.length()-1);
 }
 

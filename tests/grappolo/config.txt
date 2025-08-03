@@ -1,5 +1,5 @@
-// absolute path to target project
-project_path=/home/pars/Desktop/grappolo/gpu_graph
+// path to target project
+project_path=../../../tests/grappolo/source/gpu_graph
 
 
 // commands to apply in order

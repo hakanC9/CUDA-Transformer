@@ -31,8 +31,9 @@ CUDA_TransformerTool::CUDA_TransformerTool() {
     for(auto inc : parser.parseWhitespace(Configurations["compilation_database_options"])){
         compileFlags.push_back(inc);
     }    
-
+    
     for(auto inc : parser.parseWhitespace(Configurations["includes"])){
+        std::cout  << inc << "\n";
         compileFlags.push_back(inc);
     }
 
@@ -212,7 +213,7 @@ std::vector<std::string> CUDA_TransformerTool::run(std::string& optimizationStri
     std::cout << "\nExecuting the depo...\n";
 
     // Adding run options are commented-out until proper bug fix
-    std::string command = "sudo ./energy.sh "+ Configurations["executable_path"] + " " ;//+ Configurations["run_options"];
+    std::string command = "sudo ./energy.sh "+ Configurations["executable_path"] + " "  + Configurations["run_options"];
 
     std::array<char, 128> buffer;
     std::stringstream executionResult;
@@ -295,6 +296,7 @@ void CUDA_TransformerTool::revertToOriginal(){
     );
 
     std::filesystem::remove_all("temp_save");
+    std::cout << "\nFiles are reverted back to original\n";
 }
 
 

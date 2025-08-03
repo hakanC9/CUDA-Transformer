@@ -3,7 +3,6 @@
 #include <vector>
 #include "Helper/Logger.h"
 
-
 /*
 * Example usage of the tool
 */
@@ -23,8 +22,8 @@ int main(int argc, char** argv) {
 
     std::vector<std::vector<std::string>> results;
 
-    for(auto optimzation:optimizatons){
-        logger.log(TransformerToolTest.transform(optimzation), optimzation);
+    for(auto optimization:optimizatons){
+        logger.log(TransformerToolTest.transform(optimization), optimization);
     }
 
 }

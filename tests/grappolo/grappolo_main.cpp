@@ -2,7 +2,6 @@
 #include <string>
 #include <vector>
 #include "Helper/Logger.h"
-#include "iostream"
 
 /*
 * Example usage of the tool
