@@ -20,6 +20,9 @@
 
 #include <boost/process.hpp>
 
+#include <unistd.h>
+#include <limits.h>
+
 CUDA_TransformerTool::CUDA_TransformerTool() {
 
     Configurations = parser.readConfig();
@@ -170,13 +173,21 @@ std::vector<std::string> CUDA_TransformerTool::transform(std::string optimizatio
 
         if (ret != 0) {
             std::cerr << "[Error] Command sequence failed with code: " << ret << "\n";
-            exit(-1);
+            std::cerr << "Could not complete the optimization for:\n";
+            std::cerr << optimizationString << "\n Reverting back the files\n";
+
+            revertToOriginal();
+            return {"-1", "-1", "-1" , "-1"};
         }
 
         std::cout << "All commands executed successfully.\n";
     } catch (const std::exception& e) {
         std::cerr << "[Exception] " << e.what() << "\n";
-        exit(-1);
+        std::cerr << "Could not complete the optimization for:\n";
+        std::cerr << optimizationString << "\n Reverting back the files\n";
+
+        revertToOriginal();
+        return {"-1", "-1", "-1" , "-1"};
     }
     
 
@@ -207,8 +218,8 @@ void CUDA_TransformerTool::setAccuracyEvaluator(std::unique_ptr<AccuracyEvaluato
  * 2 -> Execution Time (t): second
  * 3 -> Power Consumption (P): Watt
  */
-std::vector<std::string> CUDA_TransformerTool::run(std::string& optimizationString){
-    
+std::vector<std::string> CUDA_TransformerTool::run(std::string& optimizationString) {
+
     std::cout << "\nExecuting the depo...\n";
 
     // Adding run options are commented-out until proper bug fix
@@ -249,11 +260,17 @@ std::vector<std::string> CUDA_TransformerTool::run(std::string& optimizationStri
  */
 void CUDA_TransformerTool::copyTransformedToOriginal(std::string& optimizationString) {
 
-    std::filesystem::copy(
-        "temp_results/" + optimizationString,
-        Configurations["project_path"],
-        std::filesystem::copy_options::overwrite_existing | std::filesystem::copy_options::recursive
-    );
+    try{
+        std::filesystem::copy(
+            "temp_results/" + optimizationString,
+            Configurations["project_path"],
+            std::filesystem::copy_options::overwrite_existing | std::filesystem::copy_options::recursive
+        );
+    }
+    catch (const std::filesystem::filesystem_error& e) {
+        std::cerr << "Error copying transformed files to target path: " << e.what() << std::endl;
+        exit(-1);
+    }
 }
 
 
@@ -275,6 +292,7 @@ void CUDA_TransformerTool::saveOriginal(){
 
     } catch (const std::filesystem::filesystem_error& e) {
         std::cerr << "Error copying original files: " << e.what() << std::endl;
+        exit(-1);
     }
 }
 

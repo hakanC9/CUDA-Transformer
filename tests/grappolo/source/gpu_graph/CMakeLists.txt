@@ -1,4 +1,5 @@
 # grappolo
+
 set( GPU_HEADERS
   ${CMAKE_SOURCE_DIR}/gpu_graph
 )
@@ -22,9 +23,6 @@ set( GPUFOLDER_SRC
      #     ${CMAKE_SOURCE_DIR}/${GPUFOLDER}/preprocessing.cu
    )
 
-list(APPEND CUDA_NVCC_FLAGS "--disable-warnings")
-
-
 CUDA_ADD_EXECUTABLE( gpu_graph 
   ${GPUFOLDER_SRC}
   OPTIONS 
@@ -34,7 +32,6 @@ CUDA_ADD_EXECUTABLE( gpu_graph
   -gencode=arch=compute_80,code=sm_80
 )
 
-                       
 target_include_directories( gpu_graph 
      PUBLIC 
      ${GPU_HEADERS}
