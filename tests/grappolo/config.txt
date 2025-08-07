@@ -23,7 +23,7 @@ includes=/home/pars/Desktop/gpu_graph_original;/home/pars/Desktop/grappolo/Defin
 
 
 // run options to apply
-run_options=-f 5 -p 100 /home/pars/Desktop/grappolo/datasets/karateApprox100.graph -b 0 -o
+run_options=-f 5 -p 100 /home/pars/Desktop/grappolo/datasets/karateApprox100.graph -b 0
 
 
 // 0 for direct console output comparison (std::cout) 1 for custom comparison

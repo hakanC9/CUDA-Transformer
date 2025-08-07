@@ -223,7 +223,7 @@ std::vector<std::string> CUDA_TransformerTool::run(std::string& optimizationStri
     std::cout << "\nExecuting the depo...\n";
 
     // Adding run options are commented-out until proper bug fix
-    std::string command = "sudo ./energy.sh "+ Configurations["executable_path"] + " "  + Configurations["run_options"];
+    std::string command = "sudo ./energy.sh "+ Configurations["executable_path"]+ " " + Configurations["run_options"];
 
     std::array<char, 128> buffer;
     std::stringstream executionResult;
