@@ -1,0 +1,20 @@
+# common parameters for multiple programs
+msPause: 100               # this is the power sampling period in milliseconds
+percentStep: 5             # this parameter is Linear Search Algorithm specific and determines the size of the power limit decrease/increase step when exploring the limits range
+idleCheckTime: 10          # this is IntelDevice specific parameter which decides on duration of idle power consumption measurement
+numIterations: 1           # this parameter is specific for research dedicated apps such as StEP and DEPO_GSS and decided on how many tests are executed before the average result is reported
+perfDropStopCondition: 250 # this parameter is StEP application specific and allows the application to stop decreasing the power limit during the research when performance drops more than it is assumed by this value
+k: 2.0                     # this is parameter for EDS metric
+
+# DEPO specific parameters
+msTestPhasePeriod: 1200    # this is DEPO specific parameter and decides on Tuning Time window size, in milliseconds
+repeatTuningPeriodInSec: 0 # this parameter is DEPO specific and turns on and off periodic Tuning Phase repetition, if non-zero the periodic Tuning phase will be repeated with the given period in seconds
+doWaitPhase: 1             # this parameter is DEPO specific and turns on and off SMA Power filter based Wait Phase before Tuning Phase
+referenceRunMultiplier: 1  # this parameter is DEPO specific and allows for increasing the reference measurement Tuning Time Window for better precision
+targetMetric: 0            # 0-E, 1-EDP, 2-EDS # selection of target metric specific to DEPO - might be updated soon
+
+# Probably deprecated parameters
+reducedPowerCapRange: 0    # this parameter is StEP specific and probably deprecated and might be removed soon
+powerSampleOn: 1           # this is probably deprecated - will be removed soon
+powerLog: 1                # this parameter is probably deprecated and might be removed soon
+optimizationDelay: 0       # this parameter is probably deprecated and might be removed soon

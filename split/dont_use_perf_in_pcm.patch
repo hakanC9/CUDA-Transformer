@@ -1,0 +1,13 @@
+diff --git a/Makefile b/Makefile
+index 7ae88b6..1c0dc11 100644
+--- a/Makefile
++++ b/Makefile
+@@ -27,7 +27,7 @@ CXXFLAGS += $(COMMON_FLAGS) -std=c++11
+ 
+ # rely on Linux perf support (user needs CAP_SYS_ADMIN privileges), comment out to disable
+ ifneq ($(wildcard /usr/include/linux/perf_event.h),)
+-CXXFLAGS += -DPCM_USE_PERF
++# CXXFLAGS += -DPCM_USE_PERF
+ endif
+ 
+ ifeq ($(UNAME), Linux)

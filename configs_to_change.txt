@@ -1,0 +1,35 @@
+CMakeLists.txt
+=============
+set(LLVM_DIR ...)[line 17]
+=============
+
+
+tests/gardenia/config.txt && tests/grappolo/config.txt && tests/polybench/config.txt
+=============
+resource_dir
+includes
+run_options
+=============
+
+
+energy.sh
+=============
+DEPO_DIR [line 14]
+DEPO_COMMAND [line 28]
+=============
+
+
+tests/gardenia/src/common.mk
+=============
+CUDA_HOME
+PAPI_HOME
+CUB_DIR
+OCL_DIR
+=============
+
+
+split/CMakeLists.txt
+=============
+include_directories(...) [line 12]
+set(COMMON_LIBS ...) [line 55]
+=============
