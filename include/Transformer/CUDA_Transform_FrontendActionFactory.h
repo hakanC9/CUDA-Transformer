@@ -6,7 +6,10 @@
 class CUDA_Transform_FrontendActionFactory : public clang::tooling::FrontendActionFactory {
     public:
 
-        explicit CUDA_Transform_FrontendActionFactory(std::vector<std::string> optimizationsToApply, std::string& optimizationString);
+        explicit CUDA_Transform_FrontendActionFactory(
+            std::vector<std::string> optimizationsToApply,
+            std::string& optimizationString,
+            const std::atomic<bool>& stopFlag);
     
         std::unique_ptr<clang::FrontendAction> create() override;
         
@@ -15,6 +18,7 @@ class CUDA_Transform_FrontendActionFactory : public clang::tooling::FrontendActi
         int optimizationIndex = 0;
         std::vector<std::string> optimizationsToApply;
         std::string& optimizationString;
+        const std::atomic<bool>& stopFlag;
     };
 
 

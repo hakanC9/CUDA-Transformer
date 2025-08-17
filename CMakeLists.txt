@@ -64,6 +64,8 @@ set (
     ${CMAKE_SOURCE_DIR}/src/Helper/ConfigParser.cpp
     ${CMAKE_SOURCE_DIR}/src/Helper/DefaultEvaluator.cpp
     ${CMAKE_SOURCE_DIR}/src/Helper/Logger.cpp
+    ${CMAKE_SOURCE_DIR}/src/Helper/FileHandler.cpp
+    ${CMAKE_SOURCE_DIR}/src/Helper/QuickResponse.cpp
     )
 
 

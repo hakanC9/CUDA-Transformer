@@ -8,6 +8,8 @@
 #include <string>
 #include <vector>
 #include "Helper/AccuracyEvaluator.h"
+#include <chrono>
+#include <atomic>
 
 
 class CUDA_TransformerTool {
@@ -33,15 +35,13 @@ private:
 
     std::string optimization_indices = "";
 
+    std::atomic<bool> stopFlag{false};
+
     std::vector<std::string> run(std::string& optimizationString);
 
     std::vector<std::string> getDepoResults(std::string depoOutputString);
     
     std::string readProgramOutput();
 
-    void copyTransformedToOriginal(std::string& optimizationString);
-
-    void saveOriginal();
-
-    void revertToOriginal();
+    void runTimer(std::chrono::seconds timeout);
 };

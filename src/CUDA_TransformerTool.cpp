@@ -2,12 +2,13 @@
 #include "clang/Tooling/Tooling.h"
 #include "llvm/Support/raw_ostream.h"
 
+
 #include <cstdlib>
+#include <exception>
 #include <filesystem>
 #include <iostream>
 #include <regex>
-#include <string>
-#include <vector>
+#include <thread>
 #include <map>
 #include <sstream>
 #include <fstream>
@@ -22,6 +23,10 @@
 
 #include <unistd.h>
 #include <limits.h>
+
+#include "Helper/TimeoutException.h"
+#include "Helper/QuickResponse.h"
+#include "Helper/FileHandler.h"
 
 CUDA_TransformerTool::CUDA_TransformerTool() {
 
@@ -100,11 +105,15 @@ std::vector<std::string> CUDA_TransformerTool::analyze(){
 */
 std::vector<std::string> CUDA_TransformerTool::transform(std::string optimizationString){
 
-
+    // Check if analyze() has already run
     if(optimization_indices.empty()){
         llvm::errs() << "\n Please run analyze() first!\n";
         exit(-1);
     }
+
+    // Reset stop flag for each transformation
+    stopFlag = false;
+
 
     // Commented-out until proper evaluator implementation
 
@@ -115,7 +124,7 @@ std::vector<std::string> CUDA_TransformerTool::transform(std::string optimizatio
 
 
     // Temporarily save the original target project
-    saveOriginal();
+    FileHandler::saveOriginal(Configurations["project_path"]);
 
     // Get paths of all cuda files
     std::vector<std::string> cuFiles;
@@ -126,7 +135,7 @@ std::vector<std::string> CUDA_TransformerTool::transform(std::string optimizatio
         }
     }
 
-    // Extract each individual optimizations
+    // Extract each individual optimization
     std::stringstream ss(optimization_indices);
 
     std::vector<int> indexVec;
@@ -149,53 +158,47 @@ std::vector<std::string> CUDA_TransformerTool::transform(std::string optimizatio
         }
     }
 
-
     // Run the tool
-    clang::tooling::ClangTool Tool(*Compilations, cuFiles);
+    try{
+        clang::tooling::ClangTool Tool(*Compilations, cuFiles);
 
-    CUDA_Transform_FrontendActionFactory Factory(optimizationsToApply, optimizationString);
+        CUDA_Transform_FrontendActionFactory Factory(optimizationsToApply, optimizationString, stopFlag);
 
-    int result = Tool.run(&Factory);
+        int result = Tool.run(&Factory);
 
-    if (result != 0){
-        llvm::errs() << "Error running transform!\n";
-        exit(-1);
+        if (result != 0){
+            FileHandler::revertToOriginal(Configurations["project_path"]);
+            return QuickResponse::quickResponse("ClangTool has failed to run!", optimizationString, "-1");
+        }
+
+        // Change original files with transformed files
+        FileHandler::copyTransformedToOriginal(optimizationString, Configurations["project_path"]);
+    }
+    catch(TimeoutException& e){
+        FileHandler::revertToOriginal(Configurations["project_path"]);
+        return QuickResponse::quickResponse(e, optimizationString, "-2");
     }
 
-    // Change original files with transformed files
-    copyTransformedToOriginal(optimizationString);
-
-
+    // Run build commands in config.txt at target project path
     std::string commandString = "cd \"" + Configurations["project_path"]+ "\" && " + Configurations["commands"];
     try {
 
         int ret = boost::process::system("/bin/bash", "-c", commandString);
 
         if (ret != 0) {
-            std::cerr << "[Error] Command sequence failed with code: " << ret << "\n";
-            std::cerr << "Could not complete the optimization for:\n";
-            std::cerr << optimizationString << "\n Reverting back the files\n";
-
-            revertToOriginal();
-            return {"-1", "-1", "-1" , "-1"};
+            FileHandler::revertToOriginal(Configurations["project_path"]);
+            return QuickResponse::quickResponse("Command has failed to run!", optimizationString, "-3");
         }
 
         std::cout << "All commands executed successfully.\n";
     } catch (const std::exception& e) {
-        std::cerr << "[Exception] " << e.what() << "\n";
-        std::cerr << "Could not complete the optimization for:\n";
-        std::cerr << optimizationString << "\n Reverting back the files\n";
-
-        revertToOriginal();
-        return {"-1", "-1", "-1" , "-1"};
+        
+        return QuickResponse::quickResponse(e, optimizationString, "-4");
     }
     
-
+    // Run target projects executable
     std::vector<std::string> outputs = run(optimizationString);
-
-    // Change transformed files with original files
-    revertToOriginal();
-    
+    FileHandler::revertToOriginal(Configurations["project_path"]);
     return outputs;
 }
 
@@ -252,68 +255,6 @@ std::vector<std::string> CUDA_TransformerTool::run(std::string& optimizationStri
     results.insert(results.end(), depoResult.begin(), depoResult.end());
 
     return results;
-}
-
-
-/**
- * @brief A function that overwrites target projects files with transformed files
- */
-void CUDA_TransformerTool::copyTransformedToOriginal(std::string& optimizationString) {
-
-    try{
-        std::filesystem::copy(
-            "temp_results/" + optimizationString,
-            Configurations["project_path"],
-            std::filesystem::copy_options::overwrite_existing | std::filesystem::copy_options::recursive
-        );
-    }
-    catch (const std::filesystem::filesystem_error& e) {
-        std::cerr << "Error copying transformed files to target path: " << e.what() << std::endl;
-        exit(-1);
-    }
-}
-
-
-/**
- * @brief A function that temporarily saves the target projects unchanged files
- */
-void CUDA_TransformerTool::saveOriginal(){
-
-    try {
-        if (std::filesystem::exists("temp_save")) {
-            std::filesystem::remove_all("temp_save");
-        }
-
-        std::filesystem::copy(
-            Configurations["project_path"],
-            "temp_save",
-            std::filesystem::copy_options::recursive
-        );
-
-    } catch (const std::filesystem::filesystem_error& e) {
-        std::cerr << "Error copying original files: " << e.what() << std::endl;
-        exit(-1);
-    }
-}
-
-
-/**
- * @brief A function that reverts the changes on the target project
- */
-void CUDA_TransformerTool::revertToOriginal(){
-
-    for (const auto& entry : std::filesystem::directory_iterator(Configurations["project_path"])) {
-        std::filesystem::remove_all(entry.path());
-    }
-
-    std::filesystem::copy(
-        "temp_save",
-        Configurations["project_path"],
-        std::filesystem::copy_options::overwrite_existing | std::filesystem::copy_options::recursive
-    );
-
-    std::filesystem::remove_all("temp_save");
-    std::cout << "\nFiles are reverted back to original\n";
 }
 
 
@@ -383,3 +324,9 @@ std::string CUDA_TransformerTool::readProgramOutput() {
     return buffer.str();
 }
 
+
+void CUDA_TransformerTool::runTimer(std::chrono::seconds timeout){
+    std::cout << "\nTimeout started\n";
+    std::this_thread::sleep_for(timeout);
+    stopFlag = true;
+}

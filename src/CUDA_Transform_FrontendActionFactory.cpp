@@ -3,10 +3,12 @@
 
 CUDA_Transform_FrontendActionFactory::CUDA_Transform_FrontendActionFactory(
     std::vector<std::string> optimizationsToApply,
-    std::string& optimizationString)
+    std::string& optimizationString,
+    const std::atomic<bool>& stopFlag)
     :
     optimizationsToApply(optimizationsToApply),
-    optimizationString(optimizationString)
+    optimizationString(optimizationString),
+    stopFlag(stopFlag)
     {}
 
 std::unique_ptr<clang::FrontendAction> CUDA_Transform_FrontendActionFactory::create()  {
