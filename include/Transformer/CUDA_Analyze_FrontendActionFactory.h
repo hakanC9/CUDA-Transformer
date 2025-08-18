@@ -7,18 +7,15 @@
 
 class CUDA_Analyze_FrontendActionFactory : public clang::tooling::FrontendActionFactory {
 
-    public:
+public:
 
-        explicit CUDA_Analyze_FrontendActionFactory();
+    explicit CUDA_Analyze_FrontendActionFactory();
+    std::unique_ptr<clang::FrontendAction> create() override;
+    std::vector<std::string> getOptimizationPossibilities();
+
+private:
     
-        std::unique_ptr<clang::FrontendAction> create() override;
-        
-        std::vector<std::string> getOptimizationPossibilities();
-
-    private:
-    
-        std::shared_ptr<std::vector<std::string>>  optimizationPossibilities;
-
-    };
+    std::shared_ptr<std::vector<std::string>>  optimizationPossibilities;
+};
 
 

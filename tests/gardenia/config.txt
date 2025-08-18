@@ -30,4 +30,4 @@ run_options=
 comparison_type=0
 
 // in seconds
-timeout=100
+timeout=1

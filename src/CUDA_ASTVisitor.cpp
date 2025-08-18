@@ -1,7 +1,11 @@
 #include "Transformer/CUDA_ASTVisitor.h"
 #include "clang/AST/Attrs.inc"
 
-CUDA_ASTVisitor::CUDA_ASTVisitor(clang::ASTContext *context, clang::Rewriter &writer, Expressions &targetExpressions)
+
+CUDA_ASTVisitor::CUDA_ASTVisitor(
+    clang::ASTContext *context,
+    clang::Rewriter &writer,
+    Expressions &targetExpressions)
     : 
     context(context), 
     writer(writer), 
@@ -10,7 +14,8 @@ CUDA_ASTVisitor::CUDA_ASTVisitor(clang::ASTContext *context, clang::Rewriter &wr
     isVisitorInsideDevice(false), 
     isNextIfNested(false),
     targetExpressions(targetExpressions)
-{}
+    {}
+    
 bool CUDA_ASTVisitor::hasKernelLaunch(clang::ForStmt *forStmt){
     
     if (!forStmt){
@@ -159,6 +164,7 @@ bool CUDA_ASTVisitor::checkNestedIf(clang::Stmt *stmt){
     return false;
 }
 
+
 bool CUDA_ASTVisitor::VisitCUDAKernelCallExpr(clang::CUDAKernelCallExpr *kernelCall){
 
     clang::SourceLocation loc = kernelCall->getBeginLoc();
@@ -168,6 +174,7 @@ bool CUDA_ASTVisitor::VisitCUDAKernelCallExpr(clang::CUDAKernelCallExpr *kernelC
     targetExpressions.kernelCalls.push_back(kernelCall);
     return true;
 }
+
 
 bool CUDA_ASTVisitor::VisitCallExpr(clang::CallExpr *callExpr){
 
@@ -195,6 +202,7 @@ bool CUDA_ASTVisitor::VisitCallExpr(clang::CallExpr *callExpr){
     return true;
 }
 
+
 bool CUDA_ASTVisitor::VisitTypeLoc(clang::TypeLoc typeLoc){
 
     clang::SourceLocation loc = typeLoc.getBeginLoc();
@@ -213,6 +221,7 @@ bool CUDA_ASTVisitor::VisitTypeLoc(clang::TypeLoc typeLoc){
 
     return true;
 }
+
 
 bool CUDA_ASTVisitor::VisitForStmt(clang::ForStmt *forStmt){
 

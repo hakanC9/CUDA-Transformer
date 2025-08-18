@@ -29,3 +29,5 @@ run_options=
 // 0 for direct console output comparison (std::cout) 1 for custom comparison
 comparison_type=0
 
+// in seconds
+timeout=1

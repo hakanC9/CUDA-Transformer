@@ -170,4 +170,3 @@ void BCSolver(Graph &g, int source, ScoreT *h_scores) {
   CUDA_SAFE_CALL(cudaFree(d_row_offsets));
   CUDA_SAFE_CALL(cudaFree(d_column_indices));
 }
-

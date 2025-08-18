@@ -13,5 +13,5 @@ std::unique_ptr<clang::ASTConsumer> CUDA_Analyze_FrontendAction::CreateASTConsum
     TheRewriter.setSourceMgr(Compiler.getSourceManager(), Compiler.getLangOpts());
 
     return std::make_unique<CUDA_Analyze_ASTConsumer>(&Compiler.getASTContext(), TheRewriter, 
-                                                    targetExpressions, transformer, optimizationPossibilities);
+                                                targetExpressions, optimizationPossibilities);
 }

@@ -3,6 +3,7 @@
 #include "clang/Tooling/CompilationDatabase.h"
 #include "clang/Tooling/Tooling.h"
 #include "Helper/ConfigParser.h"
+#include "Helper/Timer.h"
 
 #include <memory>
 #include <string>
@@ -43,5 +44,4 @@ private:
     
     std::string readProgramOutput();
 
-    void runTimer(std::chrono::seconds timeout);
 };

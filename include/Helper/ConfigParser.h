@@ -16,4 +16,6 @@ public:
     std::string  parseIncludes(std::string line);
 
     std::vector<std::string> parseWhitespace(std::string line);
+
+    std::vector<std::string> extractOptimizations(const std::string& optimization_indices, const std::string& optimizationString);
 };

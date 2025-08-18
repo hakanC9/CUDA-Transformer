@@ -12,21 +12,23 @@
 
 class CUDA_Transform_FrontendAction : public clang::ASTFrontendAction {
 
-    public:
-        CUDA_Transform_FrontendAction(std::string optChoices, std::string& optimizationString);
+public:
+    CUDA_Transform_FrontendAction(std::string optChoices, std::string& optimizationString, const std::atomic<bool>& stopFlag);
 
-        std::unique_ptr<clang::ASTConsumer> CreateASTConsumer(
-            clang::CompilerInstance &Compiler,
-            llvm::StringRef InFile) override;
+    std::unique_ptr<clang::ASTConsumer> CreateASTConsumer(
+        clang::CompilerInstance &Compiler,
+        llvm::StringRef InFile) override;
 
-        void EndSourceFileAction() override;
+    void EndSourceFileAction() override;
 
+
+private:
+
+    clang::Rewriter TheRewriter;
+    Expressions targetExpressions;
+    Transformer transformer;
     
-    private:
-        clang::Rewriter TheRewriter;
-        Expressions targetExpressions;
-        Transformer transformer;
-        
-        std::string OptChoices;
-        std::string& optimizationString;
+    std::string OptChoices;
+    std::string& optimizationString;
+    const std::atomic<bool>& stopFlag;
 };

@@ -67,7 +67,7 @@ std::string ConfigParser::parseOptions(std::string line){
 
 
 /**
- * @brief A helper function that parses config.txt files includes key
+ * @brief A helper function that parses config.txt file's includes key
  * @param line   A string with semicolumn seperated values
  * @return std::string all parsed include options with -I prefix
 */
@@ -85,6 +85,11 @@ std::string  ConfigParser::parseIncludes(std::string line){
 }
 
 
+/**
+ * @brief A helper function that parses config.txt file's whitespaces
+ * @param line   A string with semicolumn seperated values
+ * @return std::string
+*/
 std::vector<std::string> ConfigParser::parseWhitespace(std::string line){
 
     std::stringstream ss(line);
@@ -97,5 +102,37 @@ std::vector<std::string> ConfigParser::parseWhitespace(std::string line){
     }
 
     return values;
+}
+
+
+/**
+ * @brief A helper function that parses optimization indices to extract individual optimizations
+ * @param line   A string with semicolumn seperated values
+ * @return std::string all individual optimization strings
+*/
+std::vector<std::string> ConfigParser::extractOptimizations(const std::string& optimization_indices, const std::string& optimizationString){
+    std::stringstream ss(optimization_indices);
+
+    std::vector<int> indexVec;
+    std::string temp;
+
+    while(std::getline(ss, temp, '-')){
+        indexVec.push_back(std::stoi(temp));
+    }
+
+    std::vector<std::string> optimizationsToApply;
+    int start = 0;
+
+    for (int index : indexVec) {
+        if(index == 0){
+            optimizationsToApply.push_back("");
+        }
+        else{
+            optimizationsToApply.push_back(optimizationString.substr(start,index));
+            start += index;            
+        }
+    }
+
+    return optimizationsToApply;
 }
 

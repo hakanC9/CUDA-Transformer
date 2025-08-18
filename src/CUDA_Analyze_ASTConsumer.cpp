@@ -5,15 +5,13 @@ CUDA_Analyze_ASTConsumer::CUDA_Analyze_ASTConsumer(
     clang::ASTContext *context, 
     clang::Rewriter &writer, 
     Expressions &targetExpressions,
-    Transformer &transformer, 
     std::shared_ptr<std::vector<std::string>> optimizationPossibilities)
     : 
     analysisVisitor(context, writer, targetExpressions), 
-    writer(writer), 
-    transformer(transformer),
+    writer(writer),
     targetExpressions(targetExpressions),
-    optimizationPossibilities(optimizationPossibilities) {}
-
+    optimizationPossibilities(optimizationPossibilities) 
+    {}
 
 
 void CUDA_Analyze_ASTConsumer::HandleTranslationUnit(clang::ASTContext &context){

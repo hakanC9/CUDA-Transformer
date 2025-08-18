@@ -3,6 +3,7 @@
 #include "llvm/Support/raw_ostream.h"
 
 
+#include <chrono>
 #include <cstdlib>
 #include <exception>
 #include <filesystem>
@@ -77,7 +78,7 @@ std::vector<std::string> CUDA_TransformerTool::analyze(){
         exit(-1);
     }
 
-    // calculate the optimization string lengths for eaach analyzed file
+    // calculate the optimization string lengths for each analyzed file
     std::vector<std::string> optimizationPossibilities = Factory.getOptimizationPossibilities();
 
     for(auto result : optimizationPossibilities){
@@ -122,7 +123,7 @@ std::vector<std::string> CUDA_TransformerTool::transform(std::string optimizatio
     //     exit(-1);
     // }
 
-
+    
     // Temporarily save the original target project
     FileHandler::saveOriginal(Configurations["project_path"]);
 
@@ -134,29 +135,14 @@ std::vector<std::string> CUDA_TransformerTool::transform(std::string optimizatio
             cuFiles.push_back(entry.path().string());
         }
     }
+    
+    // Extract each individual optimization to apply
+    std::vector<std::string> optimizationsToApply = parser.extractOptimizations(optimization_indices, optimizationString);
 
-    // Extract each individual optimization
-    std::stringstream ss(optimization_indices);
 
-    std::vector<int> indexVec;
-    std::string temp;
+    // Start the timer
+    Timer::runTimer(std::chrono::seconds(std::stoi(Configurations["timeout"])), stopFlag);
 
-    while(std::getline(ss, temp, '-')){
-        indexVec.push_back(std::stoi(temp));
-    }
-
-    std::vector<std::string> optimizationsToApply;
-    int start = 0;
-
-    for (int index : indexVec) {
-        if(index == 0){
-            optimizationsToApply.push_back("");
-        }
-        else{
-            optimizationsToApply.push_back(optimizationString.substr(start,index));
-            start += index;            
-        }
-    }
 
     // Run the tool
     try{
@@ -179,24 +165,16 @@ std::vector<std::string> CUDA_TransformerTool::transform(std::string optimizatio
         return QuickResponse::quickResponse(e, optimizationString, "-2");
     }
 
-    // Run build commands in config.txt at target project path
+    // Run build commands in config.txt at target project's path
     std::string commandString = "cd \"" + Configurations["project_path"]+ "\" && " + Configurations["commands"];
-    try {
+    int ret = boost::process::system("/bin/bash", "-c", commandString);
 
-        int ret = boost::process::system("/bin/bash", "-c", commandString);
-
-        if (ret != 0) {
-            FileHandler::revertToOriginal(Configurations["project_path"]);
-            return QuickResponse::quickResponse("Command has failed to run!", optimizationString, "-3");
-        }
-
-        std::cout << "All commands executed successfully.\n";
-    } catch (const std::exception& e) {
-        
-        return QuickResponse::quickResponse(e, optimizationString, "-4");
+    if (ret != 0) {
+        FileHandler::revertToOriginal(Configurations["project_path"]);
+        return QuickResponse::quickResponse("Build command has failed to run!", optimizationString, "-3");
     }
     
-    // Run target projects executable
+    // Run target project's executable
     std::vector<std::string> outputs = run(optimizationString);
     FileHandler::revertToOriginal(Configurations["project_path"]);
     return outputs;
@@ -223,9 +201,8 @@ void CUDA_TransformerTool::setAccuracyEvaluator(std::unique_ptr<AccuracyEvaluato
  */
 std::vector<std::string> CUDA_TransformerTool::run(std::string& optimizationString) {
 
-    std::cout << "\nExecuting the depo...\n";
 
-    // Adding run options are commented-out until proper bug fix
+
     std::string command = "sudo ./energy.sh "+ Configurations["executable_path"]+ " " + Configurations["run_options"];
 
     std::array<char, 128> buffer;
@@ -234,8 +211,8 @@ std::vector<std::string> CUDA_TransformerTool::run(std::string& optimizationStri
 
     if (!pipe)
     {
-        std::cerr << "Failed to run command.\n";
-        exit(-1);
+        FileHandler::revertToOriginal(Configurations["project_path"]);
+        return QuickResponse::quickResponse("energy.sh has failed to run!", optimizationString, "-4");
     }
 
     // Read the output of the command
@@ -251,7 +228,6 @@ std::vector<std::string> CUDA_TransformerTool::run(std::string& optimizationStri
     std::vector<std::string> results;
     
     results.push_back(programExecutionResult);
-
     results.insert(results.end(), depoResult.begin(), depoResult.end());
 
     return results;
@@ -296,7 +272,7 @@ std::vector<std::string> CUDA_TransformerTool::getDepoResults(std::string depoOu
 
 
 /**
- * @brief A function that reads EP_stdout.txt file generated from DEPO Tool for target projects' output
+ * @brief A function that reads EP_stdout.txt file generated from DEPO Tool for target project's output
  * 
  * @return std::string Read output
  */
@@ -325,8 +301,3 @@ std::string CUDA_TransformerTool::readProgramOutput() {
 }
 
 
-void CUDA_TransformerTool::runTimer(std::chrono::seconds timeout){
-    std::cout << "\nTimeout started\n";
-    std::this_thread::sleep_for(timeout);
-    stopFlag = true;
-}

@@ -11,33 +11,33 @@
 
 #include "Transformer/Expressions.h"
 
-class CUDA_ASTVisitor : public clang::RecursiveASTVisitor<CUDA_ASTVisitor>
-{
+class CUDA_ASTVisitor : public clang::RecursiveASTVisitor<CUDA_ASTVisitor>{
 
-  
-    clang::ASTContext *context;
-    clang::Rewriter &writer;
-    clang::ParentMapContext parentMapContext;
+public:
+  explicit CUDA_ASTVisitor(clang::ASTContext *context, clang::Rewriter &writer, Expressions &targetExpressions);
 
-    // We aim that changed the inside the kernel function(mostly)
-    // So we need the ensure the expressions is inside the kernel function not the host functions
-    bool isVisitorInsideKernel;
-    bool isVisitorInsideDevice;
-    bool isNextIfNested; // Flag to indicate whether the next if statement is nested
+  bool VisitCUDAKernelCallExpr(clang::CUDAKernelCallExpr *kernelCallEexpr);
+  bool VisitCallExpr(clang::CallExpr *callExpr);
+  bool VisitFunctionDecl(clang::FunctionDecl *funcDecl);
+  bool VisitTypeLoc(clang::TypeLoc typeLoc);
+  bool VisitForStmt(clang::ForStmt *forStmt);
+  Expressions &targetExpressions;
 
-    bool checkNestedIf(clang::Stmt *stmt);
-    std::vector<clang::Stmt *> bodies; // Store the bodies of if-else statements
+private:
+  clang::ASTContext *context;
+  clang::Rewriter &writer;
+  clang::ParentMapContext parentMapContext;
 
-    bool hasKernelLaunch(clang::ForStmt *forStmt);
+  // We aim that changed the inside the kernel function(mostly)
+  // So we need the ensure the expressions is inside the kernel function not the host functions
+  bool isVisitorInsideKernel;
+  bool isVisitorInsideDevice;
+  bool isNextIfNested; // Flag to indicate whether the next if statement is nested
 
-  public:
-    explicit CUDA_ASTVisitor(clang::ASTContext *context, clang::Rewriter &writer, Expressions &targetExpressions);
+  bool checkNestedIf(clang::Stmt *stmt);
+  std::vector<clang::Stmt *> bodies; // Store the bodies of if-else statements
 
-    bool VisitCUDAKernelCallExpr(clang::CUDAKernelCallExpr *kernelCallEexpr);
-    bool VisitCallExpr(clang::CallExpr *callExpr);
-    bool VisitFunctionDecl(clang::FunctionDecl *funcDecl);
-    bool VisitTypeLoc(clang::TypeLoc typeLoc);
-    bool VisitForStmt(clang::ForStmt *forStmt);
-    Expressions &targetExpressions;
+  bool hasKernelLaunch(clang::ForStmt *forStmt);
+
 };
 

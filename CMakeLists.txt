@@ -66,6 +66,7 @@ set (
     ${CMAKE_SOURCE_DIR}/src/Helper/Logger.cpp
     ${CMAKE_SOURCE_DIR}/src/Helper/FileHandler.cpp
     ${CMAKE_SOURCE_DIR}/src/Helper/QuickResponse.cpp
+    ${CMAKE_SOURCE_DIR}/src/Helper/Timer.cpp
     )
 
 

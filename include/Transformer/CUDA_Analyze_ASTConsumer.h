@@ -11,19 +11,23 @@
 class CUDA_Analyze_ASTConsumer : public clang::ASTConsumer
 {
 
-    public:
-        explicit CUDA_Analyze_ASTConsumer(clang::ASTContext *context, clang::Rewriter &writer, Expressions &targetExpressions,
-                                Transformer &transformer, std::shared_ptr<std::vector<std::string>> optimizationPossibilities);
+public:
 
-        virtual void HandleTranslationUnit(clang::ASTContext &Context) override;
-        Expressions &targetExpressions;
-        std::string getOptimizationPossibilities();
+    explicit CUDA_Analyze_ASTConsumer(clang::ASTContext *context,
+                                      clang::Rewriter &writer,
+                                      Expressions &targetExpressions,
+                                      std::shared_ptr<std::vector<std::string>> optimizationPossibilities);
 
-    private:
-        CUDA_ASTVisitor analysisVisitor;
-        clang::Rewriter &writer;
-        Transformer &transformer;
-        std::shared_ptr<std::vector<std::string>> optimizationPossibilities;
+    Expressions &targetExpressions;
+
+    virtual void HandleTranslationUnit(clang::ASTContext &Context) override;
+    std::string getOptimizationPossibilities();
+
+private:
+
+    CUDA_ASTVisitor analysisVisitor;
+    clang::Rewriter &writer;
+    std::shared_ptr<std::vector<std::string>> optimizationPossibilities;
         
 };
 

@@ -12,19 +12,18 @@
 
 class CUDA_Analyze_FrontendAction : public clang::ASTFrontendAction {
 
-    public:
-        clang::Rewriter TheRewriter;
-        Expressions targetExpressions;
-        Transformer transformer;
+public:
+    
+    CUDA_Analyze_FrontendAction(std::shared_ptr<std::vector<std::string>> optimizationPossibilities);
 
-        CUDA_Analyze_FrontendAction(std::shared_ptr<std::vector<std::string>> optimizationPossibilities);
+    clang::Rewriter TheRewriter;
+    Expressions targetExpressions;
 
-        std::unique_ptr<clang::ASTConsumer> CreateASTConsumer(
-            clang::CompilerInstance &Compiler,
-            llvm::StringRef InFile) override;
+    std::unique_ptr<clang::ASTConsumer> CreateASTConsumer(clang::CompilerInstance &Compiler, llvm::StringRef InFile) override;
 
-    private:
-        std::shared_ptr<std::vector<std::string>> optimizationPossibilities;
+private:
+
+    std::shared_ptr<std::vector<std::string>> optimizationPossibilities;
 
 };
 

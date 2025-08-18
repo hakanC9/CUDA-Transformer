@@ -3,4 +3,5 @@ build/
 .clangd
 .cache/
 .config.txt
-
+tests/gardenia/source/bin/*
+tests/grappolo/source/bin/*
