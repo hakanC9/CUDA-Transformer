@@ -1,7 +1,5 @@
 #include "Transformer/Transformer.h"
-#include "Helper/TimeoutException.h"
 
-Transformer::Transformer(const std::atomic<bool>& stopFlag):stopFlag(stopFlag){}
 
 void Transformer::addCommand(std::unique_ptr<TransformCommand> command)
 {
@@ -26,11 +24,8 @@ void Transformer::displayWrongChoiceError()
                     "\n######################################\n";
 }
 
-void Transformer::executeCommands()
-{
-    for (const auto &command : commands)
-    {
-        if(stopFlag) throw TimeoutException("Timeout has occured while transformation process!");
+void Transformer::executeCommands(){
+    for (const auto &command : commands){
         command->execute();
     }
 }

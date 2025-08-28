@@ -13,7 +13,7 @@
 class CUDA_Transform_FrontendAction : public clang::ASTFrontendAction {
 
 public:
-    CUDA_Transform_FrontendAction(std::string optChoices, std::string& optimizationString, const std::atomic<bool>& stopFlag);
+    CUDA_Transform_FrontendAction(std::string optChoices, std::string& optimizationString);
 
     std::unique_ptr<clang::ASTConsumer> CreateASTConsumer(
         clang::CompilerInstance &Compiler,
@@ -30,5 +30,4 @@ private:
     
     std::string OptChoices;
     std::string& optimizationString;
-    const std::atomic<bool>& stopFlag;
 };

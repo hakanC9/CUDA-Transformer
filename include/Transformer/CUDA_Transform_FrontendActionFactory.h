@@ -8,8 +8,7 @@ class CUDA_Transform_FrontendActionFactory : public clang::tooling::FrontendActi
 
         explicit CUDA_Transform_FrontendActionFactory(
             std::vector<std::string> optimizationsToApply,
-            std::string& optimizationString,
-            const std::atomic<bool>& stopFlag);
+            std::string& optimizationString);
     
         std::unique_ptr<clang::FrontendAction> create() override;
         
@@ -18,7 +17,6 @@ class CUDA_Transform_FrontendActionFactory : public clang::tooling::FrontendActi
         int optimizationIndex = 0;
         std::vector<std::string> optimizationsToApply;
         std::string& optimizationString;
-        const std::atomic<bool>& stopFlag;
     };
 
 

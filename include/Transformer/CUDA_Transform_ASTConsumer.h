@@ -12,7 +12,7 @@ class CUDA_Transform_ASTConsumer : public clang::ASTConsumer{
 public:
 
     explicit CUDA_Transform_ASTConsumer(clang::ASTContext *context, clang::Rewriter &writer, Expressions &targetExpressions,
-                                        Transformer &transformer, std::string optimizationChoices, const std::atomic<bool>& stopFlag);
+                                        Transformer &transformer, std::string optimizationChoices);
 
     virtual void HandleTranslationUnit(clang::ASTContext &Context) override;
     void applyOptimizationsChoices(clang::ASTContext &context); 
@@ -24,6 +24,4 @@ private:
     clang::Rewriter &writer;
     Transformer &transformer;
     std::string optimizationChoices;  
-    const std::atomic<bool>& stopFlag;
-
 };

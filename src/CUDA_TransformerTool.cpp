@@ -140,43 +140,38 @@ std::vector<std::string> CUDA_TransformerTool::transform(std::string optimizatio
     std::vector<std::string> optimizationsToApply = parser.extractOptimizations(optimization_indices, optimizationString);
 
 
-    // Start the timer
-    Timer::runTimer(std::chrono::seconds(std::stoi(Configurations["timeout"])), stopFlag);
-
-
     // Run the tool
-    try{
-        clang::tooling::ClangTool Tool(*Compilations, cuFiles);
 
-        CUDA_Transform_FrontendActionFactory Factory(optimizationsToApply, optimizationString, stopFlag);
+    clang::tooling::ClangTool Tool(*Compilations, cuFiles);
 
-        int result = Tool.run(&Factory);
+    CUDA_Transform_FrontendActionFactory Factory(optimizationsToApply, optimizationString);
 
-        if (result != 0){
-            FileHandler::revertToOriginal(Configurations["project_path"]);
-            return QuickResponse::quickResponse("ClangTool has failed to run!", optimizationString, "-1");
-        }
+    int result = Tool.run(&Factory);
 
-        // Change original files with transformed files
-        FileHandler::copyTransformedToOriginal(optimizationString, Configurations["project_path"]);
-    }
-    catch(TimeoutException& e){
+    if (result != 0){
         FileHandler::revertToOriginal(Configurations["project_path"]);
-        return QuickResponse::quickResponse(e, optimizationString, "-2");
+        return QuickResponse::quickResponse("ClangTool has failed to run!", optimizationString, "-1");
     }
+
+    // Change original files with transformed files
+    FileHandler::copyTransformedToOriginal(optimizationString, Configurations["project_path"]);
 
     // Run build commands in config.txt at target project's path
     std::string commandString = "cd \"" + Configurations["project_path"]+ "\" && " + Configurations["commands"];
     int ret = boost::process::system("/bin/bash", "-c", commandString);
+
+    // Exception lazım
 
     if (ret != 0) {
         FileHandler::revertToOriginal(Configurations["project_path"]);
         return QuickResponse::quickResponse("Build command has failed to run!", optimizationString, "-3");
     }
     
+    // Start the timer
+    Timer::runTimer(std::chrono::seconds(std::stoi(Configurations["timeout"])), stopFlag);
+
     // Run target project's executable
     std::vector<std::string> outputs = run(optimizationString);
-    FileHandler::revertToOriginal(Configurations["project_path"]);
     return outputs;
 }
 
@@ -201,36 +196,59 @@ void CUDA_TransformerTool::setAccuracyEvaluator(std::unique_ptr<AccuracyEvaluato
  */
 std::vector<std::string> CUDA_TransformerTool::run(std::string& optimizationString) {
 
+    std::cout << "Execution started\n";
+    try{
+        std::atomic<bool> timedOut{false};
+        std::string command = "./energy.sh";
+        std::vector<std::string> args = { Configurations["executable_path"], Configurations["run_options"] };
+
+        boost::process::ipstream pipe_stream;
+        boost::process::child c(command, boost::process::args(args), boost::process::std_out > pipe_stream);
+
+        std::stringstream executionResult;
+        std::string line;
+
+        // Thread to monitor stopFlag
+        std::thread killer([c_ptr = &c, &timedOut, this]() {
+            while (c_ptr->running()) {
+                if (stopFlag.load()) {
+                    std::cout << "Stopping child process..." << std::endl;
+                    c_ptr->terminate();
+                    timedOut = true; // signal main thread
+                    break;
+                }
+                std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            }
+        });
 
 
-    std::string command = "sudo ./energy.sh "+ Configurations["executable_path"]+ " " + Configurations["run_options"];
+        // Read stdout of the child
+        while (pipe_stream && std::getline(pipe_stream, line)) {
+            executionResult << line << '\n';
+        }
 
-    std::array<char, 128> buffer;
-    std::stringstream executionResult;
-    std::unique_ptr<FILE, decltype(&pclose)> pipe(popen(command.c_str(), "r"), pclose);
+        c.wait();        // ensure process has exited
+        killer.join();   // join the killer thread
 
-    if (!pipe)
-    {
+        if (timedOut) throw TimeoutException("Timeout has occurred!");
+
+
+        std::vector<std::string> depoResult = getDepoResults(executionResult.str());
+        std::string programExecutionResult = readProgramOutput();
+
+        std::vector<std::string> results;
+        results.push_back(programExecutionResult);
+        results.insert(results.end(), depoResult.begin(), depoResult.end());
+
         FileHandler::revertToOriginal(Configurations["project_path"]);
-        return QuickResponse::quickResponse("energy.sh has failed to run!", optimizationString, "-4");
+        return results;
     }
-
-    // Read the output of the command
-    while (fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr)
-    {
-        executionResult << buffer.data();
+    catch (const TimeoutException& e){
+        FileHandler::revertToOriginal(Configurations["project_path"]);
+        return QuickResponse::quickResponse(
+            std::string("energy.sh has failed to run! Error: ") + e.what(),
+            optimizationString, "-2");
     }
-
-
-    std::vector<std::string> depoResult = getDepoResults(executionResult.str());
-    std::string programExecutionResult = readProgramOutput();
-    
-    std::vector<std::string> results;
-    
-    results.push_back(programExecutionResult);
-    results.insert(results.end(), depoResult.begin(), depoResult.end());
-
-    return results;
 }
 
 

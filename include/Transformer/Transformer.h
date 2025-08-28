@@ -21,7 +21,7 @@ class Transformer{
 
 public:
 
-    Transformer(const std::atomic<bool>& stopFlag);
+    Transformer() = default;
     ~Transformer() = default; // Destructor to clean up commands
     void executeCommands();   // Execute all commands
     void addCommand(std::unique_ptr<TransformCommand> command);
@@ -46,5 +46,4 @@ private:
 
     void displayWrongChoiceError();
     std::queue<int> choiceQueue;
-    const std::atomic<bool>& stopFlag;
 };

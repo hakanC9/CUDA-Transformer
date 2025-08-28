@@ -8,8 +8,9 @@ int main(int argc, char** arv) {
 
     CUDA_TransformerTool TransformerToolTest;
     Logger logger;
-    
+
     // 11343434343434566777777
+    
     std::vector<std::string> analyzeResults = TransformerToolTest.analyze();
 
     std::string optimization = "11111111111111111111111";
