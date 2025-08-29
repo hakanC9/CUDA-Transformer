@@ -5,7 +5,6 @@
 
 #include <chrono>
 #include <cstdlib>
-#include <exception>
 #include <filesystem>
 #include <iostream>
 #include <regex>
@@ -160,7 +159,6 @@ std::vector<std::string> CUDA_TransformerTool::transform(std::string optimizatio
     std::string commandString = "cd \"" + Configurations["project_path"]+ "\" && " + Configurations["commands"];
     int ret = boost::process::system("/bin/bash", "-c", commandString);
 
-    // Exception lazım
 
     if (ret != 0) {
         FileHandler::revertToOriginal(Configurations["project_path"]);
@@ -172,6 +170,9 @@ std::vector<std::string> CUDA_TransformerTool::transform(std::string optimizatio
 
     // Run target project's executable
     std::vector<std::string> outputs = run(optimizationString);
+
+    // Clean temporary files
+    FileHandler::cleanup();
     return outputs;
 }
 
@@ -212,9 +213,8 @@ std::vector<std::string> CUDA_TransformerTool::run(std::string& optimizationStri
         std::thread killer([c_ptr = &c, &timedOut, this]() {
             while (c_ptr->running()) {
                 if (stopFlag.load()) {
-                    std::cout << "Stopping child process..." << std::endl;
                     c_ptr->terminate();
-                    timedOut = true; // signal main thread
+                    timedOut = true;
                     break;
                 }
                 std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -222,13 +222,13 @@ std::vector<std::string> CUDA_TransformerTool::run(std::string& optimizationStri
         });
 
 
-        // Read stdout of the child
+        // Read output of the child
         while (pipe_stream && std::getline(pipe_stream, line)) {
             executionResult << line << '\n';
         }
 
-        c.wait();        // ensure process has exited
-        killer.join();   // join the killer thread
+        c.wait();    
+        killer.join();  
 
         if (timedOut) throw TimeoutException("Timeout has occurred!");
 

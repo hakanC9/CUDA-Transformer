@@ -31,4 +31,4 @@ comparison_type=0
 
 
 // in seconds
-timeout=1
+timeout=100

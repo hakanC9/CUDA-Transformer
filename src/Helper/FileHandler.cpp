@@ -70,3 +70,28 @@ void FileHandler::revertToOriginal(const std::string& path){
     std::filesystem::remove_all("temp_save");
     std::cout << "\nFiles are reverted back to original\n";
 }
+
+
+/**
+ * @brief A function that removes all temporary files
+ */
+void FileHandler::cleanup(){
+
+    try {
+        if (std::filesystem::exists("temp_save")) {
+            std::filesystem::remove_all("temp_save");
+        }
+        if (std::filesystem::exists("temp_results")) {
+            std::filesystem::remove_all("temp_results");
+        }
+        if (std::filesystem::exists("EP_stdout.txt")) {
+            std::filesystem::remove("EP_stdout.txt");
+        }
+        if (std::filesystem::exists("kernels_count")) {
+            std::filesystem::remove("kernels_count");
+        }
+    } catch (const std::filesystem::filesystem_error& e) {
+        std::cerr << "Error removing temporary files: " << e.what() << std::endl;
+        exit(-1);
+    }
+}

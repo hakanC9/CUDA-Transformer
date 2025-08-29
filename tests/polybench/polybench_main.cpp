@@ -10,7 +10,6 @@ int main(int argc, char** argv) {
 
 
     CUDA_TransformerTool TransformerToolTest;
-    Logger logger;
     
     std::vector<std::string> analyzeResults = TransformerToolTest.analyze();
 
@@ -23,7 +22,7 @@ int main(int argc, char** argv) {
     std::vector<std::vector<std::string>> results;
 
     for(auto optimization:optimizatons){
-        logger.log(TransformerToolTest.transform(optimization), optimization);
+        TransformerToolTest.transform(optimization);
     }
 
 }
